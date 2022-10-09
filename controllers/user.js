@@ -1,10 +1,7 @@
 const { response } = require('express');
-// const User = require('../models/user');
 const { conexionDB } = require('../helpers/configdb');
 
 const getUsers = async(req, res = response) => {
-    // const id = req.query.id || "";
-    // let registropp = Number(process.env.DOCSPERPAGE);
 
     try {
         let query = 'SELECT * FROM user';

@@ -4,13 +4,13 @@ require('dotenv').config();
 
 const app = express();
 
-// conexionDB();
-
 app.use(cors());
 app.use(express.json());
 
 app.use('/user', require('./routes/user'));
 
-app.listen(process.env.PUERTO, () => {
-    console.log('Servidor escuchando en el puerto', process.env.PUERTO);
+// const PORT = process.env.NODE_ENV === 'local' ? process.env.PUERTO : process.env.PORT || 5000;
+const PORT = process.env.PUERTO;
+app.listen(PORT, () => {
+    console.log('Server listening on port ', PORT);
 });

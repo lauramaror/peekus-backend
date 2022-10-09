@@ -7,15 +7,22 @@ const conexionDB = function conexionDB(sql, values, next) {
         next = values;
         values = null;
     }
-    var connection = mysql.createConnection({
-        host: process.env.DB_HOST,
-        database: "peekus",
-        user: "root",
+    const config = process.env.NODE_ENV === 'local' ? {
+        host: process.env.LOCAL_DB_HOST,
+        database: process.env.LOCAL_DB_NAME,
+        user: process.env.LOCAL_DB_USER,
         password: process.env.LOCAL_DB_PASSWORD
-    });
+    } : {
+        host: process.env.PROD_DB_HOST,
+        database: process.env.PROD_DB_NAME,
+        user: process.env.PROD_DB_USER,
+        password: process.env.PROD_DB_PASSWORD
+    }
+    console.log(process.env.NODE_ENV);
+    const connection = mysql.createConnection(config);
     connection.connect(function(err) {
         if (err !== null) {
-            console.log("[MYSQL] Error connecting to mysql:" + err + '\n');
+            console.log("Error connecting to mysql: " + err + '\n');
         }
     });
     connection.query(sql, values, function(err) {
