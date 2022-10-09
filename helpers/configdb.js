@@ -18,7 +18,6 @@ const conexionDB = function conexionDB(sql, values, next) {
         user: process.env.PROD_DB_USER,
         password: process.env.PROD_DB_PASSWORD
     }
-    console.log(process.env.NODE_ENV);
     const connection = mysql.createConnection(config);
     connection.connect(function(err) {
         if (err !== null) {

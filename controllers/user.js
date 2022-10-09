@@ -2,7 +2,7 @@ const { response } = require('express');
 const { conexionDB } = require('../helpers/configdb');
 
 const getUsers = async(req, res = response) => {
-
+    console.log('getUsers');
     try {
         let query = 'SELECT * FROM user';
         let users = [];
