@@ -1,0 +1,35 @@
+export const EVENT_STATUS = {
+    ONGOING: "ONGOING",
+    NEXT: "NEXT",
+    FINISHED: "FINISHED"
+};
+
+export const EVENT_TYPE = {
+    PUBLIC: "PUBLIC",
+    PRIVATE: "PRIVATE",
+    EXCLUSIVE: "EXCLUSIVE"
+};
+
+export const CODE_TYPE = {
+    QR: "QR",
+    NUMERIC: "NUMERIC",
+    INVITE: "INVITE"
+};
+
+export const FRIEND_STATUS = {
+    PENDING: "PENDING",
+    ACCEPTED: "ACCEPTED",
+    REJECTED: "REJECTED"
+};
+
+export const NOTIFICATION_TYPE = {
+    FRIEND_REQUEST: "PENDING",
+    EVENT_START: "EVENT_START",
+    EVENT_FINISHED: "EVENT_FINISHED"
+};
+
+export const IMAGE_TYPE = {
+    PROFILE: "PROFILE",
+    COLLAGE: "COLLAGE",
+    EVENT: "EVENT"
+};
