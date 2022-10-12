@@ -1,6 +1,7 @@
 const { response } = require('express');
 const { conexionDB } = require('../helpers/configdb');
 const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcryptjs');
 
 const getUsers = async(req, res = response) => {
     console.log('getUsers');
@@ -43,14 +44,19 @@ const saveUser = async(req, res = response) => {
     const email = body.email;
     const profilePicture = body.idProfilePicture;
     try {
-        if (username && await checkIfDuplicate(username) && password && (phone || email)) {
-            let query = 'INSERT INTO \`user\` VALUES (\'' + uuidv4() + '\',';
+        if (username && !(await checkIfDuplicate(username)) && password && (phone || email)) {
+            const salt = bcrypt.genSaltSync();
+            const cpassword = bcrypt.hashSync(password, salt);
+            const userId = uuidv4();
+            let query = 'INSERT INTO \`user\` VALUES (\'' + userId + '\',';
             query += name ? '\'' + name + '\',' : null + ',';
-            query += '\'' + username + '\', \'' + password + '\',';
+            query += '\'' + username + '\', \'' + cpassword + '\',';
             query += phone ? '\'' + phone + '\',' : null + ',';
             query += '\'' + active + '\',';
             query += email ? '\'' + email + '\',' : null + ',';
             query += profilePicture ? '\'' + profilePicture + '\');' : null + ');';
+
+            // const tokenUser = await generateJWT(userId);
 
             conexionDB(query, function(err, rows) {
                 if (err) {
@@ -59,6 +65,7 @@ const saveUser = async(req, res = response) => {
                     res.json({
                         ok: true,
                         msg: 'User created',
+                        // token: tokenUser
                     });
                 }
             });
@@ -80,7 +87,7 @@ const checkIfDuplicate = (usernameToCheck) => {
     let query = 'SELECT * FROM user WHERE username=\'' + usernameToCheck + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
-            resolve(rows.length === 0);
+            resolve(rows.length > 0);
         })
     });
 }
@@ -95,12 +102,13 @@ const updateUser = async(req, res = response) => {
     const phone = body.phone;
     const email = body.email;
     try {
-        if (id && username && await checkIfDuplicate(username) && password && (phone || email)) {
-            let query = 'UPDATE \`user\` SET \`name\`=' + name ? '\'' + name + '\',' : null + ',';
-            query += '\`username\`=\'' + username + '\', \`password\`=\'' + password;
-            query += '\',\`phone\`=' + phone ? '\'' + phone + '\',' : null + ',';
-            query += '\`email\`=' + email ? '\'' + email + '\',' : null + ',';
-            query += 'WHERE id=\'' + id + '\'';
+        if ((id && await checkIfExists(id)) && (!username || (username && !(await checkIfDuplicate(username)))) && password && (phone || email)) {
+            let query = 'UPDATE \`user\` SET \`name\`=' + (name ? '\'' + name + '\',' : null + ',');
+            query += (username ? '\`username\`=\'' + username + '\',' : '');
+            query += '\`password\`=\'' + password + '\',';
+            query += '\`phone\`=' + (phone ? '\'' + phone + '\',' : null + ',');
+            query += '\`email\`=' + (email ? '\'' + email + '\'' : null);
+            query += ' WHERE id=\'' + id + '\'';
 
             conexionDB(query, function(err, rows) {
                 if (err) {
@@ -171,5 +179,6 @@ const checkIfExists = (userId) => {
 module.exports = {
     getUsers,
     saveUser,
-    deleteUser
+    deleteUser,
+    updateUser
 };

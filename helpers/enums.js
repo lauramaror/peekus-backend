@@ -1,35 +1,49 @@
-export const EVENT_STATUS = {
+const EVENT_STATUS = {
     ONGOING: "ONGOING",
     NEXT: "NEXT",
     FINISHED: "FINISHED"
-};
+}
 
-export const EVENT_TYPE = {
+const EVENT_TYPE = {
     PUBLIC: "PUBLIC",
     PRIVATE: "PRIVATE",
     EXCLUSIVE: "EXCLUSIVE"
-};
+}
 
-export const CODE_TYPE = {
+const CODE_TYPE = {
     QR: "QR",
     NUMERIC: "NUMERIC",
     INVITE: "INVITE"
-};
+}
 
-export const FRIEND_STATUS = {
+const FRIEND_STATUS = {
     PENDING: "PENDING",
     ACCEPTED: "ACCEPTED",
     REJECTED: "REJECTED"
-};
+}
 
-export const NOTIFICATION_TYPE = {
+const NOTIFICATION_TYPE = {
     FRIEND_REQUEST: "PENDING",
     EVENT_START: "EVENT_START",
     EVENT_FINISHED: "EVENT_FINISHED"
-};
+}
 
-export const IMAGE_TYPE = {
+const IMAGE_TYPE = {
     PROFILE: "PROFILE",
     COLLAGE: "COLLAGE",
     EVENT: "EVENT"
+}
+
+const isStringInEnum = function isStringInEnum(stringToCheck, enumToCheck) {
+    return Object.values(enumToCheck).includes(stringToCheck);
+}
+
+module.exports = {
+    EVENT_STATUS,
+    EVENT_TYPE,
+    CODE_TYPE,
+    FRIEND_STATUS,
+    NOTIFICATION_TYPE,
+    IMAGE_TYPE,
+    isStringInEnum
 };
