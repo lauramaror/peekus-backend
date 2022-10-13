@@ -11,7 +11,7 @@ const getEvents = async(req, res = response) => {
     const participant = req.query.participant || '';
     console.log('getEvents');
     try {
-        let query = 'SELECT e.*, COUNT(ep.idParticipant) as participants, COUNT(l.idUser) as likes, COUNT(c.idUser) as comments FROM event e LEFT OUTER JOIN event_participants ep ON e.id = ep.idEvent LEFT OUTER JOIN like l ON e.id = l.idEvent LEFT OUTER JOIN comment c ON e.id = c.idEvent';
+        let query = 'SELECT e.*, COUNT(ep.idParticipant) as participants, COUNT(l.idUser) as likes, COUNT(c.idUser) as comments FROM event e LEFT OUTER JOIN event_participants ep ON e.id = ep.idEvent LEFT OUTER JOIN \`like\` l ON e.id = l.idEvent LEFT OUTER JOIN comment c ON e.id = c.idEvent';
         let events = [];
 
         if (id || type || status || creator || participant) {
