@@ -49,7 +49,8 @@ const saveUser = async(req, res = response) => {
             const salt = bcrypt.genSaltSync();
             const cpassword = bcrypt.hashSync(password, salt);
             const userId = uuidv4();
-            let query = 'INSERT INTO \`user\` VALUES (\'' + userId + '\',';
+            let query = 'SET NAMES utf8mb4;';
+            query += 'INSERT INTO \`user\` VALUES (\'' + userId + '\',';
             query += name ? '\'' + name + '\',' : null + ',';
             query += '\'' + username + '\', \'' + cpassword + '\',';
             query += phone ? '\'' + phone + '\',' : null + ',';
@@ -77,6 +78,7 @@ const saveUser = async(req, res = response) => {
         }
 
     } catch (err) {
+        console.log(err);
         res.status(500).json({
             ok: false,
             msg: 'Error saving user',

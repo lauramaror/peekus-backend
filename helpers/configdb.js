@@ -12,13 +12,13 @@ const conexionDB = function conexionDB(sql, values, next) {
         database: process.env.LOCAL_DB_NAME,
         user: process.env.LOCAL_DB_USER,
         password: process.env.LOCAL_DB_PASSWORD,
-        encoding: utf8mb4
+        encoding: 'utf8mb4'
     } : {
         host: process.env.PROD_DB_HOST,
         database: process.env.PROD_DB_NAME,
         user: process.env.PROD_DB_USER,
         password: process.env.PROD_DB_PASSWORD,
-        encoding: utf8mb4
+        encoding: 'utf8mb4'
     }
     const connection = mysql.createConnection(config);
     connection.connect(function(err) {
