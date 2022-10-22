@@ -41,7 +41,7 @@ const saveUser = async(req, res = response) => {
     const username = body.username;
     const password = body.password;
     const phone = body.phone;
-    const active = body.active || '1';
+    const active = '1';
     const email = body.email;
     const profilePicture = body.idProfilePicture;
     try {
@@ -66,6 +66,7 @@ const saveUser = async(req, res = response) => {
                     res.json({
                         ok: true,
                         msg: 'User created',
+                        id: userId,
                         token: tokenUser
                     });
                 }
