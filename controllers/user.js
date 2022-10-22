@@ -49,7 +49,6 @@ const saveUser = async(req, res = response) => {
             const salt = bcrypt.genSaltSync();
             const cpassword = bcrypt.hashSync(password, salt);
             const userId = uuidv4();
-            // let query = 'SET NAMES \'utf8mb4\'; ';
             let query = 'INSERT INTO \`user\` VALUES (\'' + userId + '\',';
             query += name ? '\'' + name + '\',' : null + ',';
             query += '\'' + username + '\',\'' + cpassword + '\',';
