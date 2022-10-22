@@ -2,6 +2,7 @@ const { response } = require('express');
 const { conexionDB } = require('../helpers/configdb');
 const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcryptjs');
+const { generateJWT } = require('../helpers/generatejwt');
 
 const getUsers = async(req, res = response) => {
     console.log('getUsers');
@@ -56,7 +57,7 @@ const saveUser = async(req, res = response) => {
             query += email ? '\'' + email + '\',' : null + ',';
             query += profilePicture ? '\'' + profilePicture + '\');' : null + ');';
 
-            // const tokenUser = await generateJWT(userId);
+            const tokenUser = await generateJWT(userId);
 
             conexionDB(query, function(err, rows) {
                 if (err) {
@@ -65,7 +66,7 @@ const saveUser = async(req, res = response) => {
                     res.json({
                         ok: true,
                         msg: 'User created',
-                        // token: tokenUser
+                        token: tokenUser
                     });
                 }
             });
