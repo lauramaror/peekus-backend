@@ -86,8 +86,8 @@ const saveUser = async(req, res = response) => {
     }
 }
 
-const checkIfDuplicate = (usernameToCheck) => {
-    let query = 'SELECT * FROM user WHERE username=\'' + usernameToCheck + '\'';
+const checkIfDuplicate = (usernameToCheck, id) => {
+    let query = 'SELECT * FROM user WHERE username=\'' + usernameToCheck + '\' AND id != \'' + id + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows.length > 0);
