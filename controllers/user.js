@@ -45,7 +45,7 @@ const saveUser = async(req, res = response) => {
     const email = body.email;
     const profilePicture = body.idProfilePicture;
     try {
-        if (username && !(await checkIfDuplicate(username)) && password && (phone || email)) {
+        if (username && !(await checkIfDuplicate(username, '')) && password && (phone || email)) {
             const salt = bcrypt.genSaltSync();
             const cpassword = bcrypt.hashSync(password, salt);
             const userId = uuidv4();
@@ -105,7 +105,7 @@ const updateUser = async(req, res = response) => {
     const phone = body.phone;
     const email = body.email;
     try {
-        if ((id && await checkIfExists(id)) && (!username || (username && !(await checkIfDuplicate(username)))) && password && (phone || email)) {
+        if ((id && await checkIfExists(id)) && (!username || (username && !(await checkIfDuplicate(username, id)))) && password && (phone || email)) {
             let query = 'UPDATE \`user\` SET \`name\`=' + (name ? '\'' + name + '\',' : null + ',');
             query += (username ? '\`username\`=\'' + username + '\',' : '');
             query += '\`password\`=\'' + password + '\',';
