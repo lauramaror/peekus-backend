@@ -106,9 +106,11 @@ const updateUser = async(req, res = response) => {
     const email = body.email;
     try {
         if ((id && await checkIfExists(id)) && (!username || (username && !(await checkIfDuplicate(username, id)))) && password && (phone || email)) {
+            const salt = bcrypt.genSaltSync();
+            const cpassword = bcrypt.hashSync(password, salt);
             let query = 'UPDATE \`user\` SET \`name\`=' + (name ? '\'' + name + '\',' : null + ',');
             query += (username ? '\`username\`=\'' + username + '\',' : '');
-            query += '\`password\`=\'' + password + '\',';
+            query += '\`password\`=\'' + cpassword + '\',';
             query += '\`phone\`=' + (phone ? '\'' + phone + '\',' : null + ',');
             query += '\`email\`=' + (email ? '\'' + email + '\'' : null);
             query += ' WHERE id=\'' + id + '\'';
