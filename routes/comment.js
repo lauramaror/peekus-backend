@@ -6,6 +6,8 @@ const {
     getComments
 } = require('../controllers/comment');
 
-router.get('/', getComments);
+const { validateJWT } = require('../helpers/validatejwt');
+
+router.get('/', [validateJWT], getComments);
 
 module.exports = router;

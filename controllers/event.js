@@ -11,7 +11,15 @@ const getEvents = async(req, res = response) => {
     const participant = req.query.participant || '';
     console.log('getEvents');
     try {
-        let query = 'SELECT e.*, COUNT(ep.idParticipant) as participants, COUNT(l.idUser) as likes, COUNT(c.idUser) as comments FROM event e LEFT OUTER JOIN event_participants ep ON e.id = ep.idEvent LEFT OUTER JOIN \`like\` l ON e.id = l.idEvent LEFT OUTER JOIN comment c ON e.id = c.idEvent';
+        let query = 'SELECT e.*, u.name as creatorName, u.username as creatorUsername, COUNT(DISTINCT ep.idParticipant) as participants, COUNT(DISTINCT l.idUser) as likes, COUNT(DISTINCT c.idUser) as comments, ';
+        query += 'epu.completed as completedByUser, epu.idImage as userImage, ';
+        query += 'case l.idUser when \'' + participant + '\' then true else false end as likedByUser FROM event e ';
+        query += 'LEFT OUTER JOIN event_participants ep ON e.id = ep.idEvent ';
+        query += 'LEFT OUTER JOIN \`like\` l ON e.id = l.idEvent ';
+        query += 'LEFT OUTER JOIN comment c ON e.id = c.idEvent ';
+        query += 'LEFT OUTER JOIN user u ON u.id = e.creator ';
+        query += 'LEFT OUTER JOIN event_participants epu ON epu.idEvent = e.id';
+
         let events = [];
 
         if (id || type || status || creator || participant) {
@@ -20,7 +28,7 @@ const getEvents = async(req, res = response) => {
             if (type) query += id ? ' AND e.type=' + type : ' e.type=' + type;
             if (status) query += (id || type) ? ' AND e.status=' + status : ' e.status=' + status;
             if (creator) query += (id || type || status) ? ' AND e.creator=\'' + creator + '\'' : ' e.creator=\'' + creator + '\'';
-            if (participant) query += (id || type || status || creator) ? ' AND ep.idParticipant=\'' + participant + '\'' : ' ep.idParticipant=\'' + participant + '\'';
+            if (participant) query += (id || type || status || creator) ? ' AND epu.idParticipant=\'' + participant + '\'' : ' epu.idParticipant=\'' + participant + '\'';
         }
 
         query += ' GROUP BY e.id';

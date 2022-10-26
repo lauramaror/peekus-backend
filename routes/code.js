@@ -6,6 +6,8 @@ const {
     getCodes
 } = require('../controllers/code');
 
-router.get('/', getCodes);
+const { validateJWT } = require('../helpers/validatejwt');
+
+router.get('/', [validateJWT], getCodes);
 
 module.exports = router;

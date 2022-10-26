@@ -6,6 +6,8 @@ const {
     getFriends
 } = require('../controllers/friend');
 
-router.get('/', getFriends);
+const { validateJWT } = require('../helpers/validatejwt');
+
+router.get('/', [validateJWT], getFriends);
 
 module.exports = router;

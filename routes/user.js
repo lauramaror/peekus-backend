@@ -9,12 +9,14 @@ const {
     deleteUser
 } = require('../controllers/user');
 
-router.get('/', getUsers);
+const { validateJWT } = require('../helpers/validatejwt');
 
-router.post('/', saveUser);
+router.get('/', [validateJWT], getUsers);
 
-router.put('/', updateUser);
+router.post('/', [validateJWT], saveUser);
 
-router.delete('/', deleteUser);
+router.put('/', [validateJWT], updateUser);
+
+router.delete('/', [validateJWT], deleteUser);
 
 module.exports = router;

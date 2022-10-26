@@ -6,6 +6,8 @@ const {
     getImages
 } = require('../controllers/image');
 
-router.get('/', getImages);
+const { validateJWT } = require('../helpers/validatejwt');
+
+router.get('/', [validateJWT], getImages);
 
 module.exports = router;
