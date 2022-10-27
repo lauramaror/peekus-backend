@@ -9,11 +9,12 @@ const getEvents = async(req, res = response) => {
     const status = req.query.status || '';
     const creator = req.query.creator || '';
     const participant = req.query.participant || '';
+    const user = req.query.user || participant || '';
     console.log('getEvents');
     try {
         let query = 'SELECT e.*, u.name as creatorName, u.username as creatorUsername, COUNT(DISTINCT ep.idParticipant) as participants, COUNT(DISTINCT l.idUser) as likes, COUNT(DISTINCT c.idUser) as comments, ';
         query += 'epu.completed as completedByUser, epu.idImage as userImage, ';
-        query += 'case l.idUser when \'' + participant + '\' then true else false end as likedByUser FROM event e ';
+        query += 'case l.idUser when \'' + user + '\' then true else false end as likedByUser FROM event e ';
         query += 'LEFT OUTER JOIN event_participants ep ON e.id = ep.idEvent ';
         query += 'LEFT OUTER JOIN \`like\` l ON e.id = l.idEvent ';
         query += 'LEFT OUTER JOIN comment c ON e.id = c.idEvent ';

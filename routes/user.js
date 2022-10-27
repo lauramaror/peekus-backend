@@ -13,7 +13,7 @@ const { validateJWT } = require('../helpers/validatejwt');
 
 router.get('/', [validateJWT], getUsers);
 
-router.post('/', [validateJWT], saveUser);
+router.post('/', saveUser);
 
 router.put('/', [validateJWT], updateUser);
 
