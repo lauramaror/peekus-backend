@@ -26,8 +26,8 @@ const getEvents = async(req, res = response) => {
         if (id || type || status || creator || participant) {
             query += ' WHERE';
             if (id) query += ' e.id=\'' + id + '\'';
-            if (type) query += id ? ' AND e.type=' + type : ' e.type=' + type;
-            if (status) query += (id || type) ? ' AND e.status=' + status : ' e.status=' + status;
+            if (type) query += id ? ' AND e.type in (' + type + ')' : ' e.type in (' + type + ')';
+            if (status) query += (id || type) ? ' AND e.status in (' + status + ')' : ' e.status in (' + status + ')';
             if (creator) query += (id || type || status) ? ' AND e.creator=\'' + creator + '\'' : ' e.creator=\'' + creator + '\'';
             if (participant) query += (id || type || status || creator) ? ' AND epu.idParticipant=\'' + participant + '\'' : ' epu.idParticipant=\'' + participant + '\'';
         }
