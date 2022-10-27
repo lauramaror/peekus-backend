@@ -3,8 +3,11 @@ const { Router } = require('express');
 const router = Router();
 
 const {
-    login
+    login,
+    token
 } = require('../controllers/auth');
+
+router.get('/token', token);
 
 router.post('/', login);
 

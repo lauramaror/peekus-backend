@@ -3,6 +3,41 @@ const { conexionDB } = require('../helpers/configdb');
 const bcrypt = require('bcryptjs');
 const { generateJWT } = require('../helpers/generatejwt');
 
+const token = async(req, res = response) => {
+    const token = req.headers["token"];
+
+    try {
+        const { id, ...object } = jwt.verify(token, process.env.JWTSECRET);
+
+        const userDB = await checkIfExists(id);
+
+        if (!userDB) {
+            return res.status(400).json({
+                ok: false,
+                msg: "Invalid token"
+            });
+        }
+
+        const newToken = await generateJWT(userDB.id);
+
+        res.json({
+            ok: true,
+            msg: "token",
+            id: userDB.id,
+            name: userDB.name,
+            username: userDB.username,
+            profilePic: userDB.profilePicture,
+            token: newToken,
+        });
+    } catch (error) {
+        return res.status(500).json({
+            ok: false,
+            msg: "Invalid token",
+            token: "",
+        });
+    }
+}
+
 const login = async(req, res = response) => {
     const { userData, password } = req.body;
 
@@ -30,6 +65,9 @@ const login = async(req, res = response) => {
             ok: true,
             msg: "login",
             id: userDB.id,
+            name: userDB.name,
+            username: userDB.username,
+            profilePic: userDB.profilePicture,
             token: token,
         });
     } catch (error) {
@@ -51,5 +89,6 @@ const checkIfExists = (userData) => {
 }
 
 module.exports = {
-    login
+    login,
+    token
 };

@@ -67,6 +67,9 @@ const saveUser = async(req, res = response) => {
                         ok: true,
                         msg: 'User created',
                         id: userId,
+                        name: name,
+                        username: username,
+                        profilePic: profilePicture,
                         token: tokenUser
                     });
                 }
