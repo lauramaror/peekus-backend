@@ -2,9 +2,15 @@ const { response } = require('express');
 const { conexionDB } = require('../helpers/configdb');
 
 const getComments = async(req, res = response) => {
+    const id = req.query.id || '';
+    const idEvent = req.query.idEvent || '';
+    const user = req.query.user || '';
     console.log('getComments');
     try {
-        let query = 'SELECT * FROM comment';
+        let query = 'SELECT c.*, u.name, u.username FROM comment c LEFT OUTER JOIN user u ON ep.idUser = u.id ';
+        if (id) query += 'WHERE id = \'' + id + '\'';
+        if (idEvent) query += id ? ' AND idEvent = \'' + idEvent + '\'' : 'WHERE idEvent = \'' + idEvent + '\'';
+        if (user) query += (id || idEvent) ? ' AND user = \'' + user + '\'' : 'WHERE user = \'' + user + '\'';
         let comments = [];
 
         conexionDB(query, function(err, rows) {

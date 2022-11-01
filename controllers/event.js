@@ -55,18 +55,19 @@ const getEvents = async(req, res = response) => {
 }
 
 const getParticipantsByEvent = async(req, res = response) => {
-    const idEvent = req.query.idEvent;
-    const completed = req.query.completed;
+    const idEvent = req.query.idEvent || '';
+    const completed = req.query.completed || '';
 
     console.log('getParticipantsByEvent');
     try {
-        let query = 'SELECT * FROM event_participants WHERE idEvent = \'' + idEvent + '\'';
-        if (completed) {
-            query += ' AND completed=\'' + completed + '\'';
-        }
-        let participants = [];
-
         if (idEvent) {
+            let query = 'SELECT ep.*, u.name as name, u.username as username, u.idProfilePicture as idProfilePicture FROM event_participants ep LEFT OUTER JOIN user u ON ep.idParticipant = u.id ';
+            query += 'WHERE idEvent = \'' + idEvent + '\'';
+            if (completed) {
+                query += ' AND completed=\'' + completed + '\'';
+            }
+            let participants = [];
+
             conexionDB(query, function(err, rows) {
                 if (err) {
                     console.log(err);
@@ -78,6 +79,10 @@ const getParticipantsByEvent = async(req, res = response) => {
                     res.json(participants);
                 }
             });
+        } else {
+            response.send("Invalid parameters");
+            response.end();
+            return;
         }
 
     } catch (error) {
