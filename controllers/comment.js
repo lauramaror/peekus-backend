@@ -42,7 +42,7 @@ const saveComment = async(req, res = response) => {
     try {
         if ((text && text !== '') && (idUser && await checkIfUserExists(idUser)) && (idEvent && await checkIfEventExists(idEvent))) {
             let query = 'INSERT INTO \`comment\` VALUES (\'' + uuidv4() + '\', \'' + text + '\', ';
-            query += 'SYSUTCDATETIME, ';
+            query += 'UTC_TIMESTAMP, ';
             query += '\'' + idUser + '\', \'' + idEvent + '\')';
 
             conexionDB(query, function(err, rows) {

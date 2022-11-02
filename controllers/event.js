@@ -108,7 +108,7 @@ const saveEvent = async(req, res = response) => {
         if ((name && name !== '') && (creator && await checkIfUserExists(creator)) && (type && isStringInEnum(type, EVENT_TYPE)) && (status && isStringInEnum(status, EVENT_STATUS)) && (startDate && !isNaN(Date.parse(startDate)))) {
             let query = 'INSERT INTO \`event\` VALUES (\'' + uuidv4() + '\', \'' + name + '\', ';
             query += description ? '\'' + description + '\', ' : null + ', ';
-            query += 'CURRENT_TIMESTAMP, \'' + startDate + '\', ';
+            query += 'UTC_TIMESTAMP, \'' + startDate + '\', ';
             query += endDate ? '\'' + endDate + '\', ' : null + ', ';
             query += capacity ? '\'' + capacity + '\', ' : null + ', ';
             query += '\'' + creator + '\', \'' + type + '\', \'' + status + '\', ' + null + ')';
