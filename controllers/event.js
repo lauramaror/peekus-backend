@@ -106,7 +106,8 @@ const saveEvent = async(req, res = response) => {
     const status = body.status;
     try {
         if ((name && name !== '') && (creator && await checkIfUserExists(creator)) && (type && isStringInEnum(type, EVENT_TYPE)) && (status && isStringInEnum(status, EVENT_STATUS)) && (startDate && !isNaN(Date.parse(startDate)))) {
-            let query = 'INSERT INTO \`event\` VALUES (\'' + uuidv4() + '\', \'' + name + '\', ';
+            const idEvent = uuidv4();
+            let query = 'INSERT INTO \`event\` VALUES (\'' + idEvent + '\', \'' + name + '\', ';
             query += description ? '\'' + description + '\', ' : null + ', ';
             query += 'UTC_TIMESTAMP, \'' + startDate + '\', ';
             query += endDate ? '\'' + endDate + '\', ' : null + ', ';
@@ -119,6 +120,7 @@ const saveEvent = async(req, res = response) => {
                 } else {
                     res.json({
                         ok: true,
+                        idEvent: idEvent,
                         msg: 'Event created',
                     });
                 }
@@ -233,10 +235,87 @@ const checkIfEventExists = (eventId) => {
     });
 }
 
+const saveParticipant = async(req, res = response) => {
+    console.log('saveParticipant');
+    const body = req.body;
+    const idEvent = body.idEvent;
+    const idParticipant = body.idParticipant;
+    try {
+        if ((idParticipant && await checkIfUserExists(idParticipant)) && (idEvent && await checkIfEventExists(idEvent)) && await checkIfParticipantExists(idEvent, idParticipant)) {
+            let query = 'INSERT INTO \`event_participants\` VALUES (\'' + idEvent + '\', \'' + idParticipant + '\', ';
+            query += '\'' + 0 + '\', ' + null + ')';
+
+            conexionDB(query, function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        msg: 'Participant created',
+                    });
+                }
+            });
+        } else {
+            response.send("Invalid parameters");
+            response.end();
+            return;
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error saving participant',
+        });
+    }
+}
+
+const deleteParticipant = async(req, res = response) => {
+    console.log('deleteParticipant');
+    const idEvent = req.query.idEvent;
+    const idParticipant = req.query.idParticipant;
+    try {
+        if ((idParticipant && await checkIfUserExists(idParticipant)) && (idEvent && await checkIfEventExists(idEvent)) && !(await checkIfParticipantExists(idEvent, idParticipant))) {
+            let query = 'DELETE FROM \`event_participants\` WHERE idEvent=\'' + idEvent + '\' AND idParticipant=\'' + idParticipant + '\'';
+
+            conexionDB(query, function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        msg: 'Participant deleted',
+                    });
+                }
+            });
+        } else {
+            response.send("Invalid parameters");
+            response.end();
+            return;
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error deleting participant',
+        });
+    }
+}
+
+const checkIfParticipantExists = (eventId, participantId) => {
+    let query = 'SELECT * FROM event_participants WHERE idEvent=\'' + eventId + '\' AND idParticipant=\'' + participantId + '\'';
+    return new Promise(resolve => {
+        conexionDB(query, function(err, rows) {
+            resolve(rows.length == 0);
+        })
+    });
+}
+
 module.exports = {
     getEvents,
     getParticipantsByEvent,
     saveEvent,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    saveParticipant,
+    deleteParticipant
 };

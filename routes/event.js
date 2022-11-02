@@ -7,7 +7,9 @@ const {
     getParticipantsByEvent,
     saveEvent,
     updateEvent,
-    deleteEvent
+    deleteEvent,
+    saveParticipant,
+    deleteParticipant
 } = require('../controllers/event');
 
 const { validateJWT } = require('../helpers/validatejwt');
@@ -21,5 +23,9 @@ router.post('/', [validateJWT], saveEvent);
 router.put('/', [validateJWT], updateEvent);
 
 router.delete('/', [validateJWT], deleteEvent);
+
+router.post('/participants', [validateJWT], saveParticipant);
+
+router.delete('/participants', [validateJWT], deleteParticipant);
 
 module.exports = router;
