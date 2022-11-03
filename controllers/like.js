@@ -70,7 +70,7 @@ const deleteLike = async(req, res = response) => {
     const idEvent = req.query.idEvent;
 
     try {
-        if ((idUser && await checkIfUserExists(idUser)) && (idEvent && await checkIfEventExists(idEvent)) && (await checkIfLikeExists(idUser, idEvent))) {
+        if (!idUser || !(await checkIfUserExists(idUser)) || !idEvent || !(await checkIfEventExists(idEvent)) || !(await checkIfLikeExists(idUser, idEvent))) {
             return res.status(500).json({
                 ok: false,
                 msg: 'Like does not exist'
