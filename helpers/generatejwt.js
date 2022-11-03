@@ -7,7 +7,7 @@ const generateJWT = (uid) => {
         };
 
         const expiration = {
-            expiresIn: 24 * 60 * 60
+            expiresIn: "60d"
         }
 
         jwt.sign(
