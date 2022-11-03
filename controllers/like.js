@@ -36,7 +36,7 @@ const saveLike = async(req, res = response) => {
     const idUser = body.idUser;
     const idEvent = body.idEvent;
     try {
-        if ((idUser && await checkIfUserExists(idUser)) && (idEvent && await checkIfEventExists(idEvent))) {
+        if ((idUser && await checkIfUserExists(idUser)) && (idEvent && await checkIfEventExists(idEvent)) && !(await checkIfLikeExists(idUser, idEvent))) {
             let query = 'INSERT INTO \`like\` VALUES (UTC_TIMESTAMP, ';
             query += '\'' + idEvent + '\', \'' + idUser + '\')';
 
