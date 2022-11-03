@@ -2,6 +2,7 @@ const { response } = require('express');
 const { conexionDB } = require('../helpers/configdb');
 const bcrypt = require('bcryptjs');
 const { generateJWT } = require('../helpers/generatejwt');
+const jwt = require("jsonwebtoken");
 
 const token = async(req, res = response) => {
     const token = req.headers["token"];
@@ -80,7 +81,7 @@ const login = async(req, res = response) => {
 }
 
 const checkIfExists = (userData) => {
-    let query = 'SELECT * FROM user WHERE username=\'' + userData + '\' OR phone=\'' + userData + '\' OR email=\'' + userData + '\'';
+    let query = 'SELECT * FROM user WHERE username=\'' + userData + '\' OR phone=\'' + userData + '\' OR email=\'' + userData + '\' OR id=\'' + userData + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows.length ? rows[0] : null);
