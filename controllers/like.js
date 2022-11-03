@@ -1,49 +1,44 @@
 const { response } = require('express');
 const { conexionDB } = require('../helpers/configdb');
-const { v4: uuidv4 } = require('uuid');
 
-const getComments = async(req, res = response) => {
-    const id = req.query.id || '';
+const getLikes = async(req, res = response) => {
     const idEvent = req.query.idEvent || '';
     const idUser = req.query.idUser || '';
-    console.log('getComments');
+    console.log('getLikes');
     try {
-        let query = 'SELECT c.*, u.name, u.username FROM comment c LEFT OUTER JOIN user u ON c.idUser = u.id ';
-        if (id) query += 'WHERE id = \'' + id + '\'';
-        if (idEvent) query += id ? ' AND idEvent = \'' + idEvent + '\'' : 'WHERE idEvent = \'' + idEvent + '\'';
-        if (idUser) query += (id || idEvent) ? ' AND idUser = \'' + idUser + '\'' : 'WHERE idUser = \'' + idUser + '\'';
-        let comments = [];
+        let query = 'SELECT c.*, u.name, u.username FROM \`like\` c LEFT OUTER JOIN user u ON c.idUser = u.id ';
+        if (idEvent) 'WHERE idEvent = \'' + idEvent + '\'';
+        if (idUser) query += idEvent ? ' AND idUser = \'' + idUser + '\'' : 'WHERE idUser = \'' + idUser + '\'';
+        let likes = [];
 
         conexionDB(query, function(err, rows) {
             if (err) {
                 console.log(err);
             } else {
                 rows.forEach(row => {
-                    comments.push(row);
+                    likes.push(row);
                 });
-                res.json(comments);
+                res.json(likes);
             }
         });
 
     } catch (error) {
         res.status(500).json({
             ok: false,
-            msg: 'Error obtaining comments'
+            msg: 'Error obtaining likes'
         });
     }
 }
 
-const saveComment = async(req, res = response) => {
-    console.log('saveComment');
+const saveLike = async(req, res = response) => {
+    console.log('saveLike');
     const body = req.body;
-    const text = body.text;
     const idUser = body.idUser;
     const idEvent = body.idEvent;
     try {
-        if ((text && text !== '') && (idUser && await checkIfUserExists(idUser)) && (idEvent && await checkIfEventExists(idEvent))) {
-            let query = 'INSERT INTO \`comment\` VALUES (\'' + uuidv4() + '\', \'' + text + '\', ';
-            query += 'UTC_TIMESTAMP, ';
-            query += '\'' + idUser + '\', \'' + idEvent + '\')';
+        if ((idUser && await checkIfUserExists(idUser)) && (idEvent && await checkIfEventExists(idEvent))) {
+            let query = 'INSERT INTO \`like\` VALUES (UTC_TIMESTAMP, ';
+            query += '\'' + idEvent + '\', \'' + idUser + '\')';
 
             conexionDB(query, function(err, rows) {
                 if (err) {
@@ -51,7 +46,7 @@ const saveComment = async(req, res = response) => {
                 } else {
                     res.json({
                         ok: true,
-                        msg: 'Comment created',
+                        msg: 'Like created',
                     });
                 }
             });
@@ -65,23 +60,24 @@ const saveComment = async(req, res = response) => {
         console.log(err);
         res.status(500).json({
             ok: false,
-            msg: 'Error saving comment',
+            msg: 'Error saving like',
         });
     }
 }
 
-const deleteComment = async(req, res = response) => {
-    const id = req.query.id;
+const deleteLike = async(req, res = response) => {
+    const idUser = req.query.idUser;
+    const idEvent = req.query.idEvent;
 
     try {
-        if (!id || (id && !(await checkIfCommentExists(id)))) {
+        if ((idUser && await checkIfUserExists(idUser)) && (idEvent && await checkIfEventExists(idEvent)) && (await checkIfLikeExists(idUser, idEvent))) {
             return res.status(500).json({
                 ok: false,
-                msg: 'Comment does not exist'
+                msg: 'Like does not exist'
             });
         }
 
-        let query = 'DELETE FROM \`comment\` WHERE \`id\` = \'' + id + '\';'
+        let query = 'DELETE FROM \`like\` WHERE \`idUser\` = \'' + idUser + '\' AND \`idEvent\` = \'' + idEvent + '\'';
 
         conexionDB(query, function(err, rows) {
             if (err) {
@@ -89,7 +85,7 @@ const deleteComment = async(req, res = response) => {
             } else {
                 res.json({
                     ok: true,
-                    msg: 'Comment deleted',
+                    msg: 'Like deleted',
                 });
             }
         });
@@ -97,14 +93,14 @@ const deleteComment = async(req, res = response) => {
     } catch (error) {
         return res.status(500).json({
             ok: false,
-            msg: 'Error deleting comment'
+            msg: 'Error deleting like'
         });
 
     }
 }
 
-const checkIfCommentExists = (commentId) => {
-    let query = 'SELECT * FROM comment WHERE id=\'' + commentId + '\'';
+const checkIfLikeExists = (idUser, idEvent) => {
+    let query = 'SELECT * FROM \`like\` WHERE idEvent=\'' + idEvent + '\' AND idUser=\'' + idUser + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows.length > 0);
@@ -131,7 +127,7 @@ const checkIfEventExists = (eventId) => {
 }
 
 module.exports = {
-    getComments,
-    saveComment,
-    deleteComment
+    getLikes,
+    saveLike,
+    deleteLike
 };

@@ -20,6 +20,7 @@ app.use('/image', require('./routes/image'));
 app.use('/code', require('./routes/code'));
 app.use('/comment', require('./routes/comment'));
 app.use('/auth', require('./routes/auth'));
+app.use('/like', require('./routes/like'));
 
 const PORT = process.env.NODE_ENV === 'local' ? process.env.PUERTO : process.env.PORT || 5000;
 app.listen(PORT, () => {
