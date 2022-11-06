@@ -83,6 +83,7 @@ const saveImage = async(req, res = response) => {
                 } else {
                     res.json({
                         ok: true,
+                        imgId: imgId,
                         msg: 'Image created'
                     });
                 }
