@@ -16,7 +16,7 @@ router.get('/', [validateJWT], getUsers);
 
 router.post('/', saveUser);
 
-router.post('/profilepic', [validateJWT], updateProfilePicture);
+router.put('/profilepic', [validateJWT], updateProfilePicture);
 
 router.put('/', [validateJWT], updateUser);
 

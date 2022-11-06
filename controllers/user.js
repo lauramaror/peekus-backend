@@ -149,7 +149,7 @@ const updateProfilePicture = async(req, res = response) => {
     const idPhoto = body.idProfilePicture;
     try {
         if ((id && await checkIfExists(id)) && (idPhoto && await checkIfPhotoExists(idPhoto))) {
-            let query = 'UPDATE \`user\` SET \`idProfilePicture\`=' + idPhoto;
+            let query = 'UPDATE \`user\` SET \`idProfilePicture\`=\'' + idPhoto + '\'';
             query += ' WHERE id=\'' + id + '\'';
 
             conexionDB(query, function(err, rows) {
