@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require("cors");
 require('dotenv').config();
+const bodyparser = require('body-parser');
+const fileUpload = require('express-fileupload');
 
 const app = express();
 
@@ -12,6 +14,15 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+
+app.use(bodyparser.json());
+app.use(bodyparser.urlencoded({
+    extended: true
+}));
+
+app.use(fileUpload({
+    limits: { fileSize: 5 * 1024 * 1024 },
+}));
 
 app.use('/user', require('./routes/user'));
 app.use('/event', require('./routes/event'));
