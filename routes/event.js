@@ -9,6 +9,7 @@ const {
     updateEvent,
     deleteEvent,
     saveParticipant,
+    saveParticipants,
     deleteParticipant
 } = require('../controllers/event');
 
@@ -25,6 +26,8 @@ router.put('/', [validateJWT], updateEvent);
 router.delete('/', [validateJWT], deleteEvent);
 
 router.post('/participants', [validateJWT], saveParticipant);
+
+router.post('/participants/list', [validateJWT], saveParticipants);
 
 router.delete('/participants', [validateJWT], deleteParticipant);
 

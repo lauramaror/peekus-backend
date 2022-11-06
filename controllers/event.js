@@ -269,6 +269,45 @@ const saveParticipant = async(req, res = response) => {
     }
 }
 
+const saveParticipants = async(req, res = response) => {
+    console.log('saveParticipant');
+    const body = req.body;
+
+    try {
+        let valuesToInsert = '';
+        for (const newParticipant of body) {
+            const participantId = newParticipant.idParticipant;
+            const eventId = newParticipant.idEvent;
+            if ((participantId && await checkIfUserExists(participantId)) && (eventId && await checkIfEventExists(eventId)) && await checkIfParticipantExists(eventId, participantId)) {
+                valuesToInsert += '(\'' + eventId + '\', \'' + participantId + '\', \'' + 0 + '\', ' + null + '),';
+            } else {
+                response.send("Invalid parameters");
+                response.end();
+                return;
+            }
+        }
+        valuesToInsert = valuesToInsert.slice(0, -1);
+        let query = 'INSERT INTO \`event_participants\` VALUES ' + valuesToInsert;
+
+        conexionDB(query, function(err, rows) {
+            if (err) {
+                console.log(err);
+            } else {
+                res.json({
+                    ok: true,
+                    msg: 'Participants created',
+                });
+            }
+        });
+
+    } catch (err) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error saving participants',
+        });
+    }
+}
+
 const deleteParticipant = async(req, res = response) => {
     console.log('deleteParticipant');
     const idEvent = req.query.idEvent;
@@ -317,5 +356,6 @@ module.exports = {
     updateEvent,
     deleteEvent,
     saveParticipant,
+    saveParticipants,
     deleteParticipant
 };
