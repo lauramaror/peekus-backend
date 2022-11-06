@@ -142,6 +142,40 @@ const updateUser = async(req, res = response) => {
     }
 }
 
+const updateProfilePicture = async(req, res = response) => {
+    console.log('updateUser');
+    const body = req.body;
+    const id = body.idUser;
+    const idPhoto = body.idProfilePicture;
+    try {
+        if ((id && await checkIfExists(id)) && (idPhoto && await checkIfPhotoExists(idPhoto))) {
+            let query = 'UPDATE \`user\` SET \`idProfilePicture\`=' + idPhoto;
+            query += ' WHERE id=\'' + id + '\'';
+
+            conexionDB(query, function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        msg: 'User picture updated',
+                    });
+                }
+            });
+        } else {
+            response.send("Invalid parameters");
+            response.end();
+            return;
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error updating user picture',
+        });
+    }
+}
+
 const deleteUser = async(req, res = response) => {
     const id = req.query.id;
 
@@ -184,9 +218,19 @@ const checkIfExists = (userId) => {
     });
 }
 
+const checkIfPhotoExists = (imgId) => {
+    let query = 'SELECT * FROM image WHERE id=\'' + imgId + '\'';
+    return new Promise(resolve => {
+        conexionDB(query, function(err, rows) {
+            resolve(rows.length > 0);
+        })
+    });
+}
+
 module.exports = {
     getUsers,
     saveUser,
     deleteUser,
-    updateUser
+    updateUser,
+    updateProfilePicture
 };

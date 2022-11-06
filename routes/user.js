@@ -6,7 +6,8 @@ const {
     getUsers,
     saveUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    updateProfilePicture
 } = require('../controllers/user');
 
 const { validateJWT } = require('../helpers/validatejwt');
@@ -14,6 +15,8 @@ const { validateJWT } = require('../helpers/validatejwt');
 router.get('/', [validateJWT], getUsers);
 
 router.post('/', saveUser);
+
+router.post('/profilepic', [validateJWT], updateProfilePicture);
 
 router.put('/', [validateJWT], updateUser);
 
