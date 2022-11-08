@@ -308,6 +308,41 @@ const saveParticipants = async(req, res = response) => {
     }
 }
 
+const updateParticipant = async(req, res = response) => {
+    console.log('updateParticipant');
+    const body = req.body;
+    const idEvent = body.idEvent;
+    const idParticipant = body.idParticipant;
+    const completed = body.completed;
+    const idImage = body.idImage;
+    try {
+        if ((idParticipant && await checkIfUserExists(idParticipant)) && (idEvent && await checkIfEventExists(idEvent)) && !(await checkIfParticipantExists(idEvent, idParticipant))) {
+            let query = 'UPDATE \`event_participants\` SET \`completed\`=\'' + completed + '\', \`idImage\`=\'' + idImage + '\'';
+
+            conexionDB(query, function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        msg: 'Participant updated',
+                    });
+                }
+            });
+        } else {
+            response.send("Invalid parameters");
+            response.end();
+            return;
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error updating participant',
+        });
+    }
+}
+
 const deleteParticipant = async(req, res = response) => {
     console.log('deleteParticipant');
     const idEvent = req.query.idEvent;
@@ -357,5 +392,6 @@ module.exports = {
     deleteEvent,
     saveParticipant,
     saveParticipants,
-    deleteParticipant
+    deleteParticipant,
+    updateParticipant
 };

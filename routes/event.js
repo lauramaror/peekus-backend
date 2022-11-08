@@ -10,7 +10,8 @@ const {
     deleteEvent,
     saveParticipant,
     saveParticipants,
-    deleteParticipant
+    deleteParticipant,
+    updateParticipant
 } = require('../controllers/event');
 
 const { validateJWT } = require('../helpers/validatejwt');
@@ -28,6 +29,8 @@ router.delete('/', [validateJWT], deleteEvent);
 router.post('/participants', [validateJWT], saveParticipant);
 
 router.post('/participants/list', [validateJWT], saveParticipants);
+
+router.put('/participants', [validateJWT], updateParticipant);
 
 router.delete('/participants', [validateJWT], deleteParticipant);
 
