@@ -13,13 +13,14 @@ const getEvents = async(req, res = response) => {
     console.log('getEvents');
     try {
         let query = 'SELECT e.*, u.name as creatorName, u.username as creatorUsername, COUNT(DISTINCT ep.idParticipant) as participants, COUNT(DISTINCT l.idUser) as likes, COUNT(DISTINCT c.idUser) as comments, ';
-        query += 'epu.completed as completedByUser, epu.idImage as userImage, ';
+        query += '(SELECT COUNT(*) FROM event_participants WHERE e.id = idEvent AND idParticipant =\'' + user + '\') as userParticipates,';
+        query += '(SELECT completed FROM event_participants WHERE e.id = idEvent AND idParticipant =\' ' + user + '\') AS completedByUser,';
+        query += '(SELECT idImage FROM event_participants WHERE e.id = idEvent AND idParticipant =\' ' + user + '\') AS userImage,';
         query += '(SELECT COUNT(*) FROM \`like\` lu WHERE e.id = lu.idEvent AND lu.idUser = \'' + user + '\') as likedByUser FROM event e ';
         query += 'LEFT OUTER JOIN event_participants ep ON e.id = ep.idEvent ';
         query += 'LEFT OUTER JOIN \`like\` l ON e.id = l.idEvent ';
         query += 'LEFT OUTER JOIN comment c ON e.id = c.idEvent ';
         query += 'LEFT OUTER JOIN user u ON u.id = e.creator ';
-        query += 'LEFT OUTER JOIN event_participants epu ON epu.idEvent = e.id';
 
         let events = [];
 
@@ -318,6 +319,7 @@ const updateParticipant = async(req, res = response) => {
     try {
         if ((idParticipant && await checkIfUserExists(idParticipant)) && (idEvent && await checkIfEventExists(idEvent)) && !(await checkIfParticipantExists(idEvent, idParticipant))) {
             let query = 'UPDATE \`event_participants\` SET \`completed\`=\'' + completed + '\', \`idImage\`=\'' + idImage + '\'';
+            query += ' WHERE idParticipant=\'' + idParticipant + '\' AND idEvent=\'' + idEvent + '\'';
 
             conexionDB(query, function(err, rows) {
                 if (err) {
