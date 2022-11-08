@@ -14,7 +14,7 @@ const getEvents = async(req, res = response) => {
     try {
         let query = 'SELECT e.*, u.name as creatorName, u.username as creatorUsername, COUNT(DISTINCT ep.idParticipant) as participants, COUNT(DISTINCT l.idUser) as likes, COUNT(DISTINCT c.idUser) as comments, ';
         query += '(SELECT COUNT(*) FROM event_participants WHERE e.id = idEvent AND idParticipant =\'' + user + '\') as userParticipates,';
-        query += '(SELECT completed FROM event_participants WHERE e.id = idEvent AND idParticipant =\' ' + user + '\') AS completedByUser,';
+        query += '(SELECT completed FROM event_participants WHERE e.id = idEvent AND idParticipant =\'' + user + '\') AS completedByUser,';
         query += '(SELECT idImage FROM event_participants WHERE e.id = idEvent AND idParticipant = \'' + user + '\') AS userImage,';
         query += '(SELECT COUNT(*) FROM \`like\` lu WHERE e.id = lu.idEvent AND lu.idUser = \'' + user + '\') as likedByUser FROM event e ';
         query += 'LEFT OUTER JOIN event_participants ep ON e.id = ep.idEvent ';
