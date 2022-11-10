@@ -2,6 +2,8 @@ const { response } = require('express');
 const { conexionDB } = require('../helpers/configdb');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
+const createCollage = require("../helpers/generate-collage");
+// const sharp = require('sharp');
 
 const getImages = async(req, res = response) => {
     console.log('getImages');
@@ -127,6 +129,73 @@ const saveImage = async(req, res = response) => {
     }
 }
 
+const generateCollage = async(req, res = response) => {
+    console.log('generateCollage');
+    const idEvent = req.query.idEvent || '';
+    try {
+        if (idEvent && await checkIfEventExists(idEvent)) {
+            let images = (await getImagesFromEvent(idEvent)).map(i => i.data);
+
+            const collageSize = 1080;
+            const numImages = Math.ceil(images.length / 2);
+            const numImagesFinal = numImages > 1 ? numImages : 2;
+            const options = {
+                sources: images,
+                width: numImagesFinal, // number of images per row
+                height: numImagesFinal, // number of images per column
+                imageWidth: collageSize / numImagesFinal, // width of each image
+                imageHeight: collageSize / numImagesFinal, // height of each image
+                // backgroundColor: "#cccccc", // optional, defaults to #eeeeee.
+                spacing: 0, // optional: pixels between each image
+            };
+
+            createCollage(options)
+                .then((canvas) => {
+                    // const src = canvas.jpegStream();
+                    // const dest = fs.createWriteStream("fotico.jpeg");
+                    // src.pipe(dest);
+
+                    const collageId = uuidv4();
+                    const newName = Date.now() + '.jpeg';
+
+                    let query = 'INSERT INTO image SET ?';
+                    let values = {
+                        id: collageId,
+                        filename: newName,
+                        source: newName,
+                        type: 'collage',
+                        idEvent: idEvent,
+                        data: canvas.toBuffer()
+                    };
+
+                    conexionDB(query, [values], function(err, rows) {
+                        if (err) {
+                            console.log(err);
+                        } else {
+                            res.json({
+                                ok: true,
+                                msg: 'Collage generated',
+                                id: collageId,
+                            });
+                        }
+                    });
+                });
+
+        } else {
+            response.send("Invalid parameters");
+            response.end();
+            return;
+        }
+
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error generating collage'
+        });
+    }
+}
+
 const checkIfUserExists = (userId) => {
     let query = 'SELECT * FROM user WHERE id=\'' + userId + '\'';
     return new Promise(resolve => {
@@ -145,7 +214,17 @@ const checkIfEventExists = (eventId) => {
     });
 }
 
+const getImagesFromEvent = (eventId) => {
+    let query = 'SELECT * FROM image WHERE idEvent=\'' + eventId + '\' and type!=\'collage\'';
+    return new Promise(resolve => {
+        conexionDB(query, function(err, rows) {
+            resolve(rows);
+        })
+    });
+}
+
 module.exports = {
     getImages,
-    saveImage
+    saveImage,
+    generateCollage
 };

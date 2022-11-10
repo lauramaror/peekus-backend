@@ -6,7 +6,8 @@ const router = Router();
 
 const {
     getImages,
-    saveImage
+    saveImage,
+    generateCollage
 } = require('../controllers/image');
 
 // const storage = multer.diskStorage({
@@ -38,5 +39,7 @@ router.get('/', [validateJWT], getImages);
 
 // router.post('/', upload.single('image'), [validateJWT], saveImage);
 router.post('/', [validateJWT], saveImage);
+
+router.post('/collage', [validateJWT], generateCollage);
 
 module.exports = router;
