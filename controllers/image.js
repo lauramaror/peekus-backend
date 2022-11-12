@@ -176,6 +176,7 @@ const generateCollage = async(req, res = response) => {
                                 ok: true,
                                 msg: 'Collage generated',
                                 id: collageId,
+                                data: values.data
                             });
                         }
                     });
