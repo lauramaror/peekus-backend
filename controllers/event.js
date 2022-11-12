@@ -195,6 +195,40 @@ const updateEvent = async(req, res = response) => {
     }
 }
 
+const updateEventStatus = async(req, res = response) => {
+    console.log('updateEvent');
+    const body = req.body;
+    const id = req.query.id;
+    const status = body.status;
+    try {
+        if ((id && await checkIfEventExists(id)) && (status && isStringInEnum(status, EVENT_STATUS))) {
+            let query = 'UPDATE \`event\` SET \`status\`=\'' + status + '\'';
+            query += ' WHERE id=\'' + id + '\'';
+
+            conexionDB(query, function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        msg: 'Event status updated',
+                    });
+                }
+            });
+        } else {
+            response.send("Invalid parameters");
+            response.end();
+            return;
+        }
+
+    } catch (err) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error updating event status',
+        });
+    }
+}
+
 const deleteEvent = async(req, res = response) => {
     const id = req.query.id;
 
@@ -396,5 +430,6 @@ module.exports = {
     saveParticipant,
     saveParticipants,
     deleteParticipant,
-    updateParticipant
+    updateParticipant,
+    updateEventStatus
 };
