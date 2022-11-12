@@ -17,7 +17,7 @@ const getImages = async(req, res = response) => {
         if (id || type || idEvent) {
             query += ' WHERE';
             if (id) query += ' id=\'' + id + '\'';
-            if (type) query += id ? ' AND type in (' + type + ')' : ' e.type in (' + type + ')';
+            if (type) query += id ? ' AND type in (' + type + ')' : ' type in (' + type + ')';
             if (idEvent) query += (id || type) ? ' AND idEvent=\'' + idEvent + '\'' : ' idEvent=\'' + idEvent + '\'';
         }
 
