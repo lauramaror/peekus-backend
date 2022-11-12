@@ -35,7 +35,7 @@ const IMAGE_TYPE = {
 }
 
 const isStringInEnum = function isStringInEnum(stringToCheck, enumToCheck) {
-    return Object.values(enumToCheck).includes(stringToCheck);
+    return Object.values(enumToCheck).includes(stringToCheck.toUpperCase());
 }
 
 module.exports = {
