@@ -8,7 +8,7 @@ const getComments = async(req, res = response) => {
     const idUser = req.query.idUser || '';
     console.log('getComments');
     try {
-        let query = 'SELECT c.*, u.name, u.username FROM comment c LEFT OUTER JOIN user u ON c.idUser = u.id ';
+        let query = 'SELECT c.*, u.name, u.username, u.idProfilePicture FROM comment c LEFT OUTER JOIN user u ON c.idUser = u.id ';
         if (id) query += 'WHERE id = \'' + id + '\'';
         if (idEvent) query += id ? ' AND idEvent = \'' + idEvent + '\'' : 'WHERE idEvent = \'' + idEvent + '\'';
         if (idUser) query += (id || idEvent) ? ' AND idUser = \'' + idUser + '\'' : 'WHERE idUser = \'' + idUser + '\'';
