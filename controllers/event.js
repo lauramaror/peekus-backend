@@ -12,7 +12,7 @@ const getEvents = async(req, res = response) => {
     const user = req.query.user || participant || '';
     console.log('getEvents');
     try {
-        let query = 'SELECT e.*, u.name as creatorName, u.username as creatorUsername, COUNT(DISTINCT ep.idParticipant) as participants, COUNT(DISTINCT l.idUser) as likes, COUNT(DISTINCT c.idUser) as comments, ';
+        let query = 'SELECT e.*, u.name as creatorName, u.username as creatorUsername, u.idProfilePicture as creatoreProfilePicture, COUNT(DISTINCT ep.idParticipant) as participants, COUNT(DISTINCT l.idUser) as likes, COUNT(DISTINCT c.idUser) as comments, ';
         query += '(SELECT COUNT(*) FROM event_participants WHERE e.id = idEvent AND idParticipant =\'' + user + '\') as userParticipates,';
         query += '(SELECT completed FROM event_participants WHERE e.id = idEvent AND idParticipant =\'' + user + '\') AS completedByUser,';
         query += '(SELECT idImage FROM event_participants WHERE e.id = idEvent AND idParticipant = \'' + user + '\') AS userImage,';
