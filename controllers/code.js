@@ -81,6 +81,81 @@ const saveCode = async(req, res = response) => {
     }
 }
 
+const updateCode = async(req, res = response) => {
+    console.log('updateCode');
+    const id = req.query.id;
+    const body = req.body;
+    const content = body.codeContent;
+    try {
+        if ((id && await checkIfCodeExists(id)) && (content && content !== '')) {
+
+            let query = 'UPDATE code SET ? WHERE id=\'' + id + '\'';
+            let values = {
+                content: content
+            };
+
+            conexionDB(query, [values], function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        msg: 'Code updated'
+                    });
+                }
+            });
+        } else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Invalid parameters',
+            });
+            return;
+        }
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error updating code',
+        });
+    }
+}
+
+const deleteCode = async(req, res = response) => {
+    console.log('deleteCode');
+    const id = req.query.id;
+    try {
+        if ((id && await checkIfCodeExists(id))) {
+
+            let query = 'DELETE FROM code WHERE id=\'' + id + '\'';
+
+            conexionDB(query, function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        msg: 'Code deleted'
+                    });
+                }
+            });
+        } else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Invalid parameters',
+            });
+            return;
+        }
+
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error deleting code',
+        });
+    }
+}
+
 const generateQR = async(req, res = response) => {
     console.log('generateQR');
     const idEvent = req.query.idEvent || '';
@@ -255,18 +330,17 @@ const generateQR = async(req, res = response) => {
     }
 }
 
-function base64ToArrayBuffer(base64) {
-    var binary_string = window.atob(base64);
-    var len = binary_string.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
-    }
-    return bytes.buffer;
-}
-
 const checkIfEventExists = (eventId) => {
     let query = 'SELECT * FROM event WHERE id=\'' + eventId + '\'';
+    return new Promise(resolve => {
+        conexionDB(query, function(err, rows) {
+            resolve(rows.length > 0);
+        })
+    });
+}
+
+const checkIfCodeExists = (codeId) => {
+    let query = 'SELECT * FROM code WHERE id=\'' + codeId + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows.length > 0);
@@ -277,5 +351,7 @@ const checkIfEventExists = (eventId) => {
 module.exports = {
     getCodes,
     saveCode,
-    generateQR
+    generateQR,
+    updateCode,
+    deleteCode
 };

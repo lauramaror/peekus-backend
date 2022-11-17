@@ -10,6 +10,7 @@ const getEvents = async(req, res = response) => {
     const creator = req.query.creator || '';
     const participant = req.query.participant || '';
     const user = req.query.user || participant || '';
+    const text = req.query.text || '';
     console.log('getEvents');
     try {
         let query = 'SELECT e.*, u.name as creatorName, u.username as creatorUsername, u.idProfilePicture as creatorProfilePicture, COUNT(DISTINCT ep.idParticipant) as participants, COUNT(DISTINCT l.idUser) as likes, COUNT(DISTINCT c.idUser) as comments, ';
@@ -25,13 +26,14 @@ const getEvents = async(req, res = response) => {
 
         let events = [];
 
-        if (id || type || status || creator || participant) {
+        if (id || type || status || creator || participant || text) {
             query += ' WHERE';
             if (id) query += ' e.id=\'' + id + '\'';
             if (type) query += id ? ' AND e.type in (' + type + ')' : ' e.type in (' + type + ')';
             if (status) query += (id || type) ? ' AND e.status in (' + status + ')' : ' e.status in (' + status + ')';
             if (creator) query += (id || type || status) ? ' AND e.creator=\'' + creator + '\'' : ' e.creator=\'' + creator + '\'';
             if (participant) query += (id || type || status || creator) ? ' AND epu.idParticipant=\'' + participant + '\'' : ' epu.idParticipant=\'' + participant + '\'';
+            if (text) query += (id || type || status || creator || participant) ? ' AND e.name LIKE \'' + text + '%\'' : ' e.name LIKE \'' + text + '%\'';
         }
 
         query += ' GROUP BY e.id';

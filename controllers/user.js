@@ -7,12 +7,22 @@ const { generateJWT } = require('../helpers/generatejwt');
 const getUsers = async(req, res = response) => {
     console.log('getUsers');
     const id = req.query.id || '';
+    const text = req.query.text || '';
+    const username = req.query.username || '';
     try {
         let query = 'SELECT * FROM user';
         let users = [];
 
         if (id) {
             query += ' WHERE id=\'' + id + '\'';
+        }
+
+        if (text) {
+            query += ' WHERE username LIKE \'' + text + '%\'';
+        }
+
+        if (username) {
+            query += ' WHERE username = \'' + username + '\'';
         }
 
         conexionDB(query, function(err, rows) {

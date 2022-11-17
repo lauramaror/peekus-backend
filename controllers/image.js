@@ -91,40 +91,97 @@ const saveImage = async(req, res = response) => {
                 }
             });
         }
-        // if (!req.file) {
-        //     console.log("No file upload");
-        //     res.status(500).json({
-        //         ok: false,
-        //         msg: 'No file upload'
-        //     });
-        // } else {
-        //     console.log(req.file);
-        //     const imgId = uuidv4();
-        //     var imgsrc = 'uploads/' + req.file.filename;
-
-        //     let query = 'INSERT INTO image VALUES(\'' + imgId + '\',\'' + req.file.filename + '\',?,\'event\',' + null + ',' + null + ',' + null + ')';
-
-        //     res.json({
-        //         ok: true,
-        //         msg: 'pruebita'
-        //     });
-
-        //     // conexionDB(query, [imgsrc], function(err, rows) {
-        //     //     if (err) {
-        //     //         console.log(err);
-        //     //     } else {
-        //     //         res.json({
-        //     //             ok: true,
-        //     //             msg: 'Image created'
-        //     //         });
-        //     //     }
-        //     // });
-        // }
 
     } catch (error) {
         res.status(500).json({
             ok: false,
             msg: 'Error saving images'
+        });
+    }
+}
+
+const updateImage = async(req, res = response) => {
+    console.log('updateImage');
+    const id = req.query.id || '';
+    try {
+        if (!req.files) {
+            res.status(500).json({
+                ok: false,
+                msg: 'No file uploaded'
+            });
+        } else {
+            if (req.files.image.truncated) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: `Max file size is 5MB`,
+                });
+            }
+            if (!id || (id && !(await checkIfUserExists(id)))) {
+                return res.status(400).json({
+                    ok: false,
+                    msg: `Invalid params`,
+                });
+            }
+            const { data, name, size } = req.files.image;
+            const newName = Date.now() + '.' + name.split('.')[1];
+
+            let query = 'UPDATE image SET ? WHERE id=\'' + id + '\' AND type=\'PROFILE\'';
+            let values = {
+                filename: newName,
+                source: newName,
+                data: data.slice(0, size)
+            };
+
+            conexionDB(query, [values], function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        imgId: imgId,
+                        msg: 'Image updated'
+                    });
+                }
+            });
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error updating image'
+        });
+    }
+}
+
+const deleteImage = async(req, res = response) => {
+    console.log('deleteImage');
+    const id = req.query.id || '';
+    try {
+
+        if (!id || (id && !(await checkIfUserExists(id)))) {
+            return res.status(400).json({
+                ok: false,
+                msg: `Invalid params`,
+            });
+        }
+
+        let query = 'DELETE FROM image WHERE id=\'' + id + '\' AND type=\'PROFILE\'';
+
+        conexionDB(query, function(err, rows) {
+            if (err) {
+                console.log(err);
+            } else {
+                res.json({
+                    ok: true,
+                    msg: 'Image deleted'
+                });
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error deleting image'
         });
     }
 }
@@ -227,5 +284,7 @@ const getImagesFromEvent = (eventId) => {
 module.exports = {
     getImages,
     saveImage,
-    generateCollage
+    generateCollage,
+    updateImage,
+    deleteImage
 };
