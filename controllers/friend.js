@@ -4,10 +4,12 @@ const { FRIEND_STATUS, isStringInEnum } = require('../helpers/enums');
 
 const getFriends = async(req, res = response) => {
     const id = req.query.id || '';
+    const status = req.query.status || '';
     console.log('getFriends');
     try {
         let query = 'SELECT * FROM friend ';
-        if (id) query += 'WHERE idSolicitant = \'' + id + '\' OR idReceptor= \'' + id + '\'';
+        if (id) query += 'WHERE (idSolicitant = \'' + id + '\' OR idReceptor= \'' + id + '\')';
+        if (status) query += id ? ' AND status = \'' + status + '\'' : 'WHERE status = \'' + status + '\'';
         let friends = [];
 
         conexionDB(query, async function(err, rows) {
@@ -19,11 +21,7 @@ const getFriends = async(req, res = response) => {
                     row['friendData'] = userData;
                     friends.push(row);
                 }
-                // rows.forEach(async row => {
-                //     const userData = row.idSolicitanta === id ? await getUser(row.idReceptor) : await getUser(row.idSolicitant);
-                //     row['friendData'] = userData;
-                //     friends.push(row);
-                // });
+
                 res.json(friends);
             }
         });
@@ -172,7 +170,7 @@ const checkIfUserExists = (userId) => {
 }
 
 const getUser = (userId) => {
-    let query = 'SELECT * FROM user WHERE id=\'' + userId + '\'';
+    let query = 'SELECT name, username, idProfilePicture FROM user WHERE id=\'' + userId + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows);
