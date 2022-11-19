@@ -3,13 +3,15 @@ const { conexionDB } = require('../helpers/configdb');
 const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const createCollage = require("../helpers/generate-collage");
-// const sharp = require('sharp');
+const sharp = require('sharp');
 
 const getImages = async(req, res = response) => {
     console.log('getImages');
     const id = req.query.id || '';
     const type = req.query.type || '';
     const idEvent = req.query.idEvent || '';
+    const idUserParticipant = req.query.idUserParticipant || '';
+    const idUserLiked = req.query.idUserLiked || '';
     try {
         let query = 'SELECT * FROM image';
         let images = [];
@@ -19,6 +21,11 @@ const getImages = async(req, res = response) => {
             if (id) query += ' id=\'' + id + '\'';
             if (type) query += id ? ' AND type=\'' + type + '\'' : ' type=\'' + type + '\'';
             if (idEvent) query += (id || type) ? ' AND idEvent=\'' + idEvent + '\'' : ' idEvent=\'' + idEvent + '\'';
+        }
+
+        if (idUserParticipant || idUserLiked) {
+            const participatedEventIds = idUserParticipant ? (await getEventIdFromUser(idUserParticipant)) : (await getEventIdFromUserLiked(idUserLiked));
+            query += ' WHERE idEvent in (\'' + participatedEventIds.flatMap(e => e.id).join('\',\'') + '\') AND type=\'COLLAGE\'';
         }
 
         conexionDB(query, function(err, rows) {
@@ -52,19 +59,30 @@ const saveImage = async(req, res = response) => {
                 msg: 'No file uploaded'
             });
         } else {
-            if (req.files.image.truncated) {
-                return res.status(400).json({
-                    ok: false,
-                    msg: `Max file size is 5MB`,
-                });
-            }
             if (!type || (!idEvent && !idUser) || (idUser && !(await checkIfUserExists(idUser))) || (idEvent && !(await checkIfEventExists(idEvent)))) {
                 return res.status(400).json({
                     ok: false,
                     msg: `Invalid params`,
                 });
             }
+
+            let dataTruncated;
             const { data, name, size } = req.files.image;
+            await sharp(data, { failOnError: false })
+                .resize({ width: 1080, height: 1080, fit: sharp.fit.cover })
+                .toBuffer()
+                .then(data => {
+                    dataTruncated = data;
+                });
+            // if (req.files.image.truncated) {
+            //     await sharp(data, { failOnError: false })
+            //         .resize({ width: 1080, height: 1080, fit: sharp.fit.cover })
+            //         .toBuffer()
+            //         .then(data => {
+            //             dataTruncated = data;
+            //         });
+            // }
+
             const imgId = uuidv4();
             const newName = Date.now() + '.' + name.split('.')[1];
 
@@ -76,7 +94,7 @@ const saveImage = async(req, res = response) => {
                 type: type,
                 idEvent: idEvent,
                 idUser: idUser,
-                data: data.slice(0, size)
+                data: dataTruncated
             };
 
             conexionDB(query, [values], function(err, rows) {
@@ -194,7 +212,7 @@ const generateCollage = async(req, res = response) => {
             let images = (await getImagesFromEvent(idEvent)).map(i => i.data);
 
             const collageSize = 1080;
-            const numImages = Math.ceil(images.length / 2);
+            const numImages = Math.ceil(Math.sqrt(images.length));
             const numImagesFinal = numImages > 1 ? numImages : 2;
             const options = {
                 sources: images,
@@ -203,7 +221,8 @@ const generateCollage = async(req, res = response) => {
                 imageWidth: collageSize / numImagesFinal, // width of each image
                 imageHeight: collageSize / numImagesFinal, // height of each image
                 // backgroundColor: "#cccccc", // optional, defaults to #eeeeee.
-                spacing: 0, // optional: pixels between each image
+                spacing: 1, // optional: pixels between each image
+                canvasSize: collageSize,
             };
 
             createCollage(options)
@@ -274,6 +293,24 @@ const checkIfEventExists = (eventId) => {
 
 const getImagesFromEvent = (eventId) => {
     let query = 'SELECT * FROM image WHERE idEvent=\'' + eventId + '\' and type!=\'collage\'';
+    return new Promise(resolve => {
+        conexionDB(query, function(err, rows) {
+            resolve(rows);
+        })
+    });
+}
+
+const getEventIdFromUser = (userId) => {
+    let query = 'SELECT e.id FROM event e LEFT OUTER JOIN event_participants epu ON e.id = epu.idEvent WHERE epu.idParticipant=\'' + userId + '\'';
+    return new Promise(resolve => {
+        conexionDB(query, function(err, rows) {
+            resolve(rows);
+        })
+    });
+}
+
+const getEventIdFromUserLiked = (userId) => {
+    let query = 'SELECT idEvent FROM \`like\` WHERE idUser=\'' + userId + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows);

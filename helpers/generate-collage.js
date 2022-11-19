@@ -11,6 +11,7 @@ const PARAMS = [
     { field: "backgroundColor", default: "#eeeeee" },
     { field: "lines", default: [] },
     { field: "textStyle", default: {} },
+    { field: "canvasSize", default: 1080 },
 ];
 
 function getPhoto(src) {
@@ -36,8 +37,8 @@ module.exports = function(options) {
         }
     });
 
-    const canvasWidth = 1080;
-    const canvasHeight = 1080;
+    const canvasWidth = options.canvasSize;
+    const canvasHeight = options.canvasSize;
 
     const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext("2d");

@@ -22,6 +22,7 @@
         "qr-code-styling": "^1.6.0-rc.1",
         "qr-code-styling-node": "^1.5.0",
         "qrcode": "^1.5.1",
+        "sharp": "^0.31.2",
         "uuid": "^9.0.0"
     }
 }

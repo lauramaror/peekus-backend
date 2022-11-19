@@ -50,10 +50,20 @@ const saveCode = async(req, res = response) => {
     try {
         if ((content && content !== '') && (type && isStringInEnum(type, CODE_TYPE)) && (idEvent && await checkIfEventExists(idEvent))) {
             const idCode = uuidv4();
-            let query = 'INSERT INTO \`code\` VALUES (\'' + idCode + '\', \'' + content + '\', 1, ';
-            query += '\'' + idEvent + '\', \'' + type + '\')';
+            // let query = 'INSERT INTO \`code\` VALUES (\'' + idCode + '\', \'' + content + '\', 1, ';
+            // query += '\'' + idEvent + '\', \'' + type + '\')';
 
-            conexionDB(query, function(err, rows) {
+            let query = 'INSERT INTO code SET ?';
+            let values = {
+                id: idCode,
+                content: content,
+                active: 1,
+                type: type,
+                idEvent: idEvent,
+                dataQR: null
+            };
+
+            conexionDB(query, [values], function(err, rows) {
                 if (err) {
                     console.log(err);
                 } else {

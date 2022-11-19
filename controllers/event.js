@@ -102,8 +102,8 @@ const saveEvent = async(req, res = response) => {
     const body = req.body;
     const name = body.name;
     const description = body.description;
-    const startDate = body.startDate;
-    const endDate = body.endDate;
+    const startDate = body.startDate.replace('T', ' ').split('.')[0];
+    const endDate = body.endDate.replace('T', ' ').split('.')[0];
     const capacity = body.capacity;
     const creator = body.creator;
     const type = body.type;

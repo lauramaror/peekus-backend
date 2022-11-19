@@ -18,7 +18,7 @@ const getUsers = async(req, res = response) => {
         }
 
         if (text) {
-            query += ' WHERE username LIKE \'' + text + '%\'';
+            query += ' WHERE username LIKE \'' + text + '%\' OR name LIKE \'' + text + '%\'';
         }
 
         if (username) {
@@ -79,7 +79,7 @@ const saveUser = async(req, res = response) => {
                         id: userId,
                         name: name,
                         username: username,
-                        profilePic: profilePicture,
+                        idProfilePicture: profilePicture,
                         token: tokenUser
                     });
                 }

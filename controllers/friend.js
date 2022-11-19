@@ -124,7 +124,8 @@ const deleteFriend = async(req, res = response) => {
     try {
         if ((idReceptor && await checkIfUserExists(idReceptor)) && (idSolicitant && await checkIfUserExists(idSolicitant)) && !(await checkIfFriends(idSolicitant, idReceptor))) {
 
-            let query = 'DELETE FROM friend WHERE idSolicitant = \'' + idSolicitant + '\' AND idReceptor= \'' + idReceptor + '\'';
+            let query = 'DELETE FROM friend WHERE (idSolicitant = \'' + idSolicitant + '\' AND idReceptor= \'' + idReceptor + '\')';
+            query += ' OR (idSolicitant = \'' + idReceptor + '\' AND idReceptor= \'' + idSolicitant + '\')';
 
             conexionDB(query, function(err, rows) {
                 if (err) {
@@ -170,7 +171,7 @@ const checkIfUserExists = (userId) => {
 }
 
 const getUser = (userId) => {
-    let query = 'SELECT name, username, idProfilePicture FROM user WHERE id=\'' + userId + '\'';
+    let query = 'SELECT name, username, idProfilePicture, id FROM user WHERE id=\'' + userId + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows);

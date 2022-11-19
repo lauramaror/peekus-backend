@@ -27,7 +27,7 @@ const token = async(req, res = response) => {
             id: userDB.id,
             name: userDB.name,
             username: userDB.username,
-            profilePic: userDB.idProfilePicture,
+            idProfilePicture: userDB.idProfilePicture,
             token: newToken,
         });
     } catch (error) {
@@ -68,7 +68,7 @@ const login = async(req, res = response) => {
             id: userDB.id,
             name: userDB.name,
             username: userDB.username,
-            profilePic: userDB.idProfilePicture,
+            idProfilePicture: userDB.idProfilePicture,
             token: token,
         });
     } catch (error) {
