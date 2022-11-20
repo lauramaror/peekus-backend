@@ -114,21 +114,29 @@ const updateUser = async(req, res = response) => {
     const id = req.query.id;
     const name = body.name;
     const username = body.username;
-    const password = body.password;
+    // const password = body.password;
     const phone = body.phone;
     const email = body.email;
     try {
-        if ((id && await checkIfExists(id)) && (!username || (username && !(await checkIfDuplicate(username, id)))) && password && (phone || email)) {
-            const salt = bcrypt.genSaltSync();
-            const cpassword = bcrypt.hashSync(password, salt);
-            let query = 'UPDATE \`user\` SET \`name\`=' + (name ? '\'' + name + '\',' : null + ',');
-            query += (username ? '\`username\`=\'' + username + '\',' : '');
-            query += '\`password\`=\'' + cpassword + '\',';
-            query += '\`phone\`=' + (phone ? '\'' + phone + '\',' : null + ',');
-            query += '\`email\`=' + (email ? '\'' + email + '\'' : null);
-            query += ' WHERE id=\'' + id + '\'';
+        if ((id && await checkIfExists(id)) && (!username || (username && !(await checkIfDuplicate(username, id)))) && (phone || email)) {
+            // const salt = bcrypt.genSaltSync();
+            // const cpassword = bcrypt.hashSync(password, salt);
+            // let query = 'UPDATE \`user\` SET \`name\`=' + (name ? '\'' + name + '\',' : null + ',');
+            // query += (username ? '\`username\`=\'' + username + '\',' : '');
+            // query += '\`password\`=\'' + cpassword + '\',';
+            // query += '\`phone\`=' + (phone ? '\'' + phone + '\',' : null + ',');
+            // query += '\`email\`=' + (email ? '\'' + email + '\'' : null);
+            // query += ' WHERE id=\'' + id + '\'';
 
-            conexionDB(query, function(err, rows) {
+            let query = 'UPDATE user SET ? WHERE id=\'' + id + '\'';
+            let values = {
+                name: name,
+                username: username,
+                phone: phone,
+                email: email
+            };
+
+            conexionDB(query, [values], function(err, rows) {
                 if (err) {
                     console.log(err);
                 } else {
@@ -139,8 +147,10 @@ const updateUser = async(req, res = response) => {
                 }
             });
         } else {
-            response.send("Invalid parameters");
-            response.end();
+            res.status(500).json({
+                ok: false,
+                msg: 'Invalid parameters',
+            });
             return;
         }
 

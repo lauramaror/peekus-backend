@@ -16,10 +16,10 @@ const getCodes = async(req, res = response) => {
     console.log('getCodes');
     try {
         let query = 'SELECT * FROM code';
-        if (id) query += 'WHERE id = \'' + id + '\'';
-        if (idEvent) query += id ? ' AND idEvent = \'' + idEvent + '\'' : 'WHERE idEvent = \'' + idEvent + '\'';
-        if (type) query += (id || idEvent) ? ' AND type = \'' + type + '\'' : 'WHERE type = \'' + type + '\'';
-        if (content) query += (id || idEvent || type) ? ' AND content = \'' + content + '\'' : 'WHERE content = \'' + content + '\'';
+        if (id) query += ' WHERE id = \'' + id + '\'';
+        if (idEvent) query += id ? ' AND idEvent = \'' + idEvent + '\'' : ' WHERE idEvent = \'' + idEvent + '\'';
+        if (type) query += (id || idEvent) ? ' AND type = \'' + type + '\'' : ' WHERE type = \'' + type + '\'';
+        if (content) query += (id || idEvent || type) ? ' AND content = \'' + content + '\'' : ' WHERE content = \'' + content + '\'';
         let codes = [];
 
         conexionDB(query, function(err, rows) {

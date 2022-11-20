@@ -25,9 +25,8 @@ const getImages = async(req, res = response) => {
 
         if (idUserParticipant || idUserLiked) {
             const participatedEventIds = idUserParticipant ? (await getEventIdFromUser(idUserParticipant)) : (await getEventIdFromUserLiked(idUserLiked));
-            query += ' WHERE idEvent in (\'' + participatedEventIds.flatMap(e => e.id).join('\',\'') + '\') AND type=\'COLLAGE\'';
+            query += ' WHERE idEvent in (\'' + participatedEventIds.flatMap(e => e.idEvent).join('\',\'') + '\') AND type=\'COLLAGE\'';
         }
-
         conexionDB(query, function(err, rows) {
             if (err) {
                 console.log(err);
@@ -128,26 +127,27 @@ const updateImage = async(req, res = response) => {
                 msg: 'No file uploaded'
             });
         } else {
-            if (req.files.image.truncated) {
-                return res.status(400).json({
-                    ok: false,
-                    msg: `Max file size is 5MB`,
-                });
-            }
             if (!id || (id && !(await checkIfUserExists(id)))) {
                 return res.status(400).json({
                     ok: false,
                     msg: `Invalid params`,
                 });
             }
+            let dataTruncated;
             const { data, name, size } = req.files.image;
+            await sharp(data, { failOnError: false })
+                .resize({ width: 1080, height: 1080, fit: sharp.fit.cover })
+                .toBuffer()
+                .then(data => {
+                    dataTruncated = data;
+                });
             const newName = Date.now() + '.' + name.split('.')[1];
 
             let query = 'UPDATE image SET ? WHERE id=\'' + id + '\' AND type=\'PROFILE\'';
             let values = {
                 filename: newName,
                 source: newName,
-                data: data.slice(0, size)
+                data: dataTruncated
             };
 
             conexionDB(query, [values], function(err, rows) {
@@ -301,7 +301,7 @@ const getImagesFromEvent = (eventId) => {
 }
 
 const getEventIdFromUser = (userId) => {
-    let query = 'SELECT e.id FROM event e LEFT OUTER JOIN event_participants epu ON e.id = epu.idEvent WHERE epu.idParticipant=\'' + userId + '\'';
+    let query = 'SELECT idEvent FROM \`event_participants\` WHERE idParticipant=\'' + userId + '\'';
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows);
