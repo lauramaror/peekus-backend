@@ -6,7 +6,8 @@ const {
     getNotifications,
     saveNotification,
     getNotificationUsers,
-    saveNotificationUsers
+    saveNotificationUsers,
+    updateNotified
 } = require('../controllers/notification');
 
 const { validateJWT } = require('../helpers/validatejwt');
@@ -19,7 +20,7 @@ router.get('/users', [validateJWT], getNotificationUsers);
 
 router.post('/users', [validateJWT], saveNotificationUsers);
 
-// router.put('/', [validateJWT], updateCode);
+router.put('/users', [validateJWT], updateNotified);
 
 // router.delete('/', [validateJWT], deleteCode);
 

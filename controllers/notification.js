@@ -121,9 +121,10 @@ const saveNotificationUsers = async(req, res = response) => {
 
             let query = 'INSERT INTO notification_user VALUES';
             let values = [];
+            const idNotifUser = uuidv4();
             for await (const idUser of idUsers) {
                 if (await checkIfUserExists(idUser)) {
-                    values.push('(\'' + idNotification + '\',\'' + idUser + '\', 0, \'' + new Date().toISOString().replace('T', ' ').split('.')[0] + '\')');
+                    values.push('(\'' + idNotifUser + '\',\'' + idNotification + '\',\'' + idUser + '\', 0, \'' + new Date().toISOString().replace('T', ' ').split('.')[0] + '\')');
                 }
             }
             query += values.join(',');
@@ -155,45 +156,43 @@ const saveNotificationUsers = async(req, res = response) => {
     }
 }
 
-// const updateNotification = async(req, res = response) => {
-//     console.log('updateCode');
-//     const id = req.query.id;
-//     const body = req.body;
-//     const content = body.codeContent;
-//     try {
-//         if ((id && await checkIfCodeExists(id)) && (content && content !== '')) {
+const updateNotified = async(req, res = response) => {
+    console.log('updateNotified');
+    const id = req.query.id;
+    try {
+        if ((id && await checkIfNotificationUserExists(id))) {
 
-//             let query = 'UPDATE code SET ? WHERE id=\'' + id + '\'';
-//             let values = {
-//                 content: content
-//             };
+            let query = 'UPDATE notification_user SET ? WHERE id=\'' + id + '\'';
+            let values = {
+                notified: '1'
+            };
 
-//             conexionDB(query, [values], function(err, rows) {
-//                 if (err) {
-//                     console.log(err);
-//                 } else {
-//                     res.json({
-//                         ok: true,
-//                         msg: 'Code updated'
-//                     });
-//                 }
-//             });
-//         } else {
-//             res.status(500).json({
-//                 ok: false,
-//                 msg: 'Invalid parameters',
-//             });
-//             return;
-//         }
+            conexionDB(query, [values], function(err, rows) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({
+                        ok: true,
+                        msg: 'Notification user updated'
+                    });
+                }
+            });
+        } else {
+            res.status(500).json({
+                ok: false,
+                msg: 'Invalid parameters',
+            });
+            return;
+        }
 
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({
-//             ok: false,
-//             msg: 'Error updating code',
-//         });
-//     }
-// }
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            ok: false,
+            msg: 'Error updating notification user',
+        });
+    }
+}
 
 // const deleteNotification = async(req, res = response) => {
 //     console.log('deleteCode');
@@ -257,9 +256,19 @@ const checkIfUserExists = (codeId) => {
     });
 }
 
+const checkIfNotificationUserExists = (codeId) => {
+    let query = 'SELECT * FROM notification_user WHERE id=\'' + codeId + '\'';
+    return new Promise(resolve => {
+        conexionDB(query, function(err, rows) {
+            resolve(rows.length > 0);
+        })
+    });
+}
+
 module.exports = {
     getNotifications,
     saveNotification,
     getNotificationUsers,
-    saveNotificationUsers
+    saveNotificationUsers,
+    updateNotified
 };
