@@ -44,6 +44,39 @@ const getUsers = async(req, res = response) => {
     }
 }
 
+const checkUsername = async(req, res = response) => {
+    console.log('checkUsername');
+    const username = req.query.username || null;
+    try {
+        if (!username) {
+            res.status(500).json({
+                ok: false,
+                msg: 'Error checking username'
+            });
+            return;
+        }
+        let query = 'SELECT * FROM user WHERE username = \'' + username + '\'';
+        let users = [];
+
+        conexionDB(query, function(err, rows) {
+            if (err) {
+                console.log(err);
+            } else {
+                rows.forEach(row => {
+                    users.push(row);
+                });
+                res.json(users);
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            ok: false,
+            msg: 'Error checking username'
+        });
+    }
+}
+
 const saveUser = async(req, res = response) => {
     console.log('saveUser');
     const body = req.body;
@@ -252,5 +285,6 @@ module.exports = {
     saveUser,
     deleteUser,
     updateUser,
-    updateProfilePicture
+    updateProfilePicture,
+    checkUsername
 };
