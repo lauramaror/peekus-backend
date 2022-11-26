@@ -4,6 +4,8 @@ const { v4: uuidv4 } = require('uuid');
 const fs = require('fs');
 const createCollage = require("../helpers/generate-collage");
 const sharp = require('sharp');
+const path = require('path');
+const Promise = require("bluebird");
 
 const getImages = async(req, res = response) => {
     console.log('getImages');
@@ -83,7 +85,8 @@ const saveImage = async(req, res = response) => {
             // }
 
             const imgId = uuidv4();
-            const newName = Date.now() + '.' + name.split('.')[1];
+            // const newName = Date.now() + '.' + name.split('.')[1];
+            const newName = Date.now() + '.png';
 
             let query = 'INSERT INTO image SET ?';
             let values = {
@@ -204,59 +207,78 @@ const deleteImage = async(req, res = response) => {
     }
 }
 
+function createAllCollages(optionsList, idEvent) {
+    console.log('createAllCollages');
+    const canvasArray = [];
+    return Promise.each(optionsList, options => {
+        return createCollage(options).then((canvas) => {
+            canvasArray.push(canvas);
+            return true;
+        });
+    }).return(canvasArray);
+
+}
+
 const generateCollage = async(req, res = response) => {
     console.log('generateCollage');
     const idEvent = req.query.idEvent || '';
     try {
         if (idEvent && await checkIfEventExists(idEvent)) {
-            let images = (await getImagesFromEvent(idEvent)).map(i => i.data);
+            // let images = (await getImagesFromEvent(idEvent)).map(i => i.data);
 
-            const collageSize = 1080;
-            const numImages = Math.ceil(Math.sqrt(images.length));
-            const numImagesFinal = numImages > 1 ? numImages : 2;
-            const options = {
-                sources: images,
-                width: numImagesFinal, // number of images per row
-                height: numImagesFinal, // number of images per column
-                imageWidth: collageSize / numImagesFinal, // width of each image
-                imageHeight: collageSize / numImagesFinal, // height of each image
-                // backgroundColor: "#cccccc", // optional, defaults to #eeeeee.
-                spacing: 1, // optional: pixels between each image
-                canvasSize: collageSize,
-            };
+            let images = [];
+            const dirname = '../../fotitos/';
+            fs.readdirSync(dirname).forEach(file => {
+                const fileData = fs.readFileSync(path.join(dirname, file));
+                images.push(fileData);
+            });
 
-            createCollage(options)
-                .then((canvas) => {
-                    // const src = canvas.jpegStream();
-                    // const dest = fs.createWriteStream("fotico.jpeg");
-                    // src.pipe(dest);
+            console.log('images.length', images.length);
+            const optionsCollages = [];
+            const chunkSize = 100;
+            for (let i = 0; i < images.length; i += chunkSize) {
+                const chunk = images.slice(i, i + chunkSize);
+                const numImages = Math.ceil(Math.sqrt(chunk.length));
+                const numImagesFinal = numImages > 1 ? numImages : 2;
+                console.log('numImages', chunk.length);
+                const decena = Math.ceil(Math.ceil(chunk.length / 10) / 2);
+                console.log('collageSize', 1080 * (decena <= 2 ? decena : 2));
+                const collageSize = 1080 * (decena <= 2 ? decena : 2);
+                const options = {
+                    sources: chunk,
+                    width: numImagesFinal, // number of images per row
+                    height: numImagesFinal, // number of images per column
+                    imageWidth: collageSize / numImagesFinal, // width of each image
+                    imageHeight: collageSize / numImagesFinal, // height of each image
+                    spacing: 1, // optional: pixels between each image
+                    canvasSize: collageSize,
+                };
+                optionsCollages.push(options);
+            }
 
+            createAllCollages(optionsCollages, idEvent).then((promises) => {
+                let query = 'INSERT INTO image VALUES ?';
+                const valuesToInsert = [];
+
+                promises.forEach(p => {
                     const collageId = uuidv4();
                     const newName = Date.now() + '.jpeg';
+                    let values = [collageId, newName, newName, 'collage', idEvent, null, p.toBuffer()];
 
-                    let query = 'INSERT INTO image SET ?';
-                    let values = {
-                        id: collageId,
-                        filename: newName,
-                        source: newName,
-                        type: 'collage',
-                        idEvent: idEvent,
-                        data: canvas.toBuffer()
-                    };
-
-                    conexionDB(query, [values], function(err, rows) {
-                        if (err) {
-                            console.log(err);
-                        } else {
-                            res.json({
-                                ok: true,
-                                msg: 'Collage generated',
-                                id: collageId,
-                                data: values.data
-                            });
-                        }
-                    });
+                    valuesToInsert.push(values);
                 });
+
+                conexionDB(query, [valuesToInsert], function(err, rows) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        res.json({
+                            ok: true,
+                            msg: 'Collage generated',
+                        });
+                    }
+                });
+            });
 
         } else {
             response.send("Invalid parameters");
@@ -314,6 +336,14 @@ const getEventIdFromUserLiked = (userId) => {
     return new Promise(resolve => {
         conexionDB(query, function(err, rows) {
             resolve(rows);
+        })
+    });
+}
+
+const saveCollage = (options) => {
+    return new Promise(resolve => {
+        createCollage(options).then((canvas) => {
+            resolve(canvas);
         })
     });
 }
