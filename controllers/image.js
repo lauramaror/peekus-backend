@@ -224,14 +224,14 @@ const generateCollage = async(req, res = response) => {
     const idEvent = req.query.idEvent || '';
     try {
         if (idEvent && await checkIfEventExists(idEvent)) {
-            // let images = (await getImagesFromEvent(idEvent)).map(i => i.data);
+            let images = (await getImagesFromEvent(idEvent)).map(i => i.data);
 
-            let images = [];
-            const dirname = '../../fotitos/';
-            fs.readdirSync(dirname).forEach(file => {
-                const fileData = fs.readFileSync(path.join(dirname, file));
-                images.push(fileData);
-            });
+            // let images = [];
+            // const dirname = '../../fotitos/';
+            // fs.readdirSync(dirname).forEach(file => {
+            //     const fileData = fs.readFileSync(path.join(dirname, file));
+            //     images.push(fileData);
+            // });
 
             console.log('images.length', images.length);
             const optionsCollages = [];
