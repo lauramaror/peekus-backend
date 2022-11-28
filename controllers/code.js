@@ -180,7 +180,7 @@ const generateQR = async(req, res = response) => {
             const options = {
                 width: 300,
                 height: 300,
-                data: "https://www.google.es/",
+                data: "https://peekus.herokuapp.com/base/detail/" + idEvent,
                 margin: 0,
                 qrOptions: {
                     typeNumber: "0",
