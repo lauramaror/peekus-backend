@@ -85,11 +85,13 @@ const saveNotification = async(req, res = response) => {
 const getNotificationUsers = async(req, res = response) => {
     const idNotification = req.query.idNotification || '';
     const idUser = req.query.idUser || '';
+    const notified = req.query.notified;
     console.log('getNotificationUsers');
     try {
         let query = 'SELECT nu.*, n.description, n.redirectLink, u.username, u.idProfilePicture FROM notification_user nu LEFT JOIN notification n ON nu.idNotification = n.id LEFT JOIN user u ON nu.idUser = u.id';
         if (idNotification) query += ' WHERE nu.idNotification = \'' + idNotification + '\'';
         if (idUser) query += idNotification ? ' AND nu.idUser = \'' + idUser + '\'' : ' WHERE nu.idUser = \'' + idUser + '\'';
+        if (notified) query += (idNotification || idUser) ? ' AND notified = ' + notified : ' WHERE notified = ' + notified;
         let notifications = [];
 
         conexionDB(query, function(err, rows) {

@@ -12,6 +12,7 @@ const getEvents = async(req, res = response) => {
     const user = req.query.user || participant || '';
     const text = req.query.text || '';
     const pageSize = req.query.pageSize || 10;
+    const pageNum = req.query.pageNum || 0;
     console.log('getEvents');
     try {
         let query = 'SELECT e.*, u.name as creatorName, u.username as creatorUsername, u.idProfilePicture as creatorProfilePicture, COUNT(DISTINCT ep.idParticipant) as participants, COUNT(DISTINCT l.idUser) as likes, COUNT(DISTINCT c.idUser) as comments, ';
@@ -37,7 +38,7 @@ const getEvents = async(req, res = response) => {
             if (text) query += (id || type || status || creator || participant) ? ' AND e.name LIKE \'' + text + '%\'' : ' e.name LIKE \'' + text + '%\'';
         }
 
-        query += ' GROUP BY e.id LIMIT ' + pageSize;
+        query += ' GROUP BY e.id LIMIT ' + pageNum + ',' + pageSize;
 
         conexionDB(query, function(err, rows) {
             if (err) {
