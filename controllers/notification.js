@@ -51,7 +51,7 @@ const saveNotification = async(req, res = response) => {
                 notifiedDate: new Date().toISOString().replace('T', ' ').split('.')[0],
                 type: type,
                 idEvent: idEvent,
-                redirectLink: '/base/detail/' + idEvent,
+                redirectLink: 'pk/base/detail/' + idEvent,
             };
 
             conexionDB(query, [values], function(err, rows) {

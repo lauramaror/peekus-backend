@@ -160,8 +160,8 @@ const updateEvent = async(req, res = response) => {
     const id = req.query.id;
     const name = body.name;
     const description = body.description;
-    const startDate = body.startDate;
-    const endDate = body.endDate;
+    const startDate = body.startDate.replace('T', ' ').split('.')[0];
+    const endDate = body.endDate.replace('T', ' ').split('.')[0];
     const capacity = body.capacity;
     const type = body.type;
     const status = body.status;
