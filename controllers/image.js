@@ -75,17 +75,8 @@ const saveImage = async(req, res = response) => {
                 .then(data => {
                     dataTruncated = data;
                 });
-            // if (req.files.image.truncated) {
-            //     await sharp(data, { failOnError: false })
-            //         .resize({ width: 1080, height: 1080, fit: sharp.fit.cover })
-            //         .toBuffer()
-            //         .then(data => {
-            //             dataTruncated = data;
-            //         });
-            // }
 
             const imgId = uuidv4();
-            // const newName = Date.now() + '.' + name.split('.')[1];
             const newName = Date.now() + '.png';
 
             let query = 'INSERT INTO image SET ?';
@@ -207,7 +198,7 @@ const deleteImage = async(req, res = response) => {
     }
 }
 
-function createAllCollages(optionsList, idEvent) {
+function createAllCollages(optionsList) {
     console.log('createAllCollages');
     const canvasArray = [];
     return Promise.each(optionsList, options => {
@@ -256,7 +247,7 @@ const generateCollage = async(req, res = response) => {
                 optionsCollages.push(options);
             }
 
-            createAllCollages(optionsCollages, idEvent).then((promises) => {
+            createAllCollages(optionsCollages).then((promises) => {
                 let query = 'INSERT INTO image VALUES ?';
                 const valuesToInsert = [];
 

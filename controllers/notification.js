@@ -51,7 +51,7 @@ const saveNotification = async(req, res = response) => {
                 notifiedDate: new Date().toISOString().replace('T', ' ').split('.')[0],
                 type: type,
                 idEvent: idEvent,
-                redirectLink: 'pk/base/detail/' + idEvent,
+                redirectLink: '/pk/base/detail/' + idEvent,
             };
 
             conexionDB(query, [values], function(err, rows) {
@@ -195,41 +195,6 @@ const updateNotified = async(req, res = response) => {
         });
     }
 }
-
-// const deleteNotification = async(req, res = response) => {
-//     console.log('deleteCode');
-//     const id = req.query.id;
-//     try {
-//         if ((id && await checkIfCodeExists(id))) {
-
-//             let query = 'DELETE FROM code WHERE id=\'' + id + '\'';
-
-//             conexionDB(query, function(err, rows) {
-//                 if (err) {
-//                     console.log(err);
-//                 } else {
-//                     res.json({
-//                         ok: true,
-//                         msg: 'Code deleted'
-//                     });
-//                 }
-//             });
-//         } else {
-//             res.status(500).json({
-//                 ok: false,
-//                 msg: 'Invalid parameters',
-//             });
-//             return;
-//         }
-
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).json({
-//             ok: false,
-//             msg: 'Error deleting code',
-//         });
-//     }
-// }
 
 const checkIfEventExists = (eventId) => {
     let query = 'SELECT * FROM event WHERE id=\'' + eventId + '\'';

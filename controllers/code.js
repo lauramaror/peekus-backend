@@ -173,10 +173,6 @@ const generateQR = async(req, res = response) => {
         if (idEvent && await checkIfEventExists(idEvent)) {
             const idCode = uuidv4();
 
-            // let data = "https://www.google.es/";
-
-            // let stringdata = JSON.stringify(data);
-
             const options = {
                 width: 300,
                 height: 300,
@@ -291,37 +287,6 @@ const generateQR = async(req, res = response) => {
                     }
                 });
             });
-
-
-            // QRCode.toDataURL('https://www.google.es/', async function(err, code) {
-            //     if (err) return console.log("error occurred")
-
-            //     console.log(code);
-
-            //     const blob = Buffer.from(code.split(',')[1], 'base64');
-
-            //     let query = 'INSERT INTO code SET ?';
-            //     let values = {
-            //         id: idCode,
-            //         content: null,
-            //         active: 1,
-            //         type: 'qr',
-            //         idEvent: idEvent,
-            //         dataQR: blob
-            //     };
-
-            //     conexionDB(query, [values], function(err, rows) {
-            //         if (err) {
-            //             console.log(err);
-            //         } else {
-            //             res.json({
-            //                 ok: true,
-            //                 msg: 'Code created',
-            //                 idCode: idCode
-            //             });
-            //         }
-            //     });
-            // });
 
         } else {
             res.status(500).json({

@@ -25,28 +25,6 @@ const conexionDB = function conexionDB(sql, values, next) {
         charset: 'utf8mb4'
     }
 
-    // const pool = mysql.createPool(config);
-    // pool.getConnection(function(err, connection) {
-    //     if (err !== null) {
-    //         console.log("Error connecting to mysql: " + err + '\n');
-    //     }
-    //     connection.query(sql, values, function(err) {
-    //         if (err) {
-    //             throw err;
-    //         }
-    //         connection.release();
-    //         next.apply(this, arguments);
-    //     });
-    // });
-    // pool.query(sql, values, function(err) {
-    //     // pool.end();
-    //     if (err) {
-    //         throw err;
-    //     }
-    //     pool.release();
-    //     next.apply(this, arguments);
-    // });
-
     const connection = mysql.createConnection(config);
     connection.connect(function(err) {
         if (err !== null) {
