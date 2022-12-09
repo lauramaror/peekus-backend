@@ -217,12 +217,24 @@ const generateCollage = async(req, res = response) => {
         if (idEvent && await checkIfEventExists(idEvent)) {
             let images = (await getImagesFromEvent(idEvent)).map(i => i.data);
 
-            // let images = [];
+            // let images2 = [];
             // const dirname = '../../fotitos/';
             // fs.readdirSync(dirname).forEach(file => {
             //     const fileData = fs.readFileSync(path.join(dirname, file));
-            //     images.push(fileData);
+            //     images2.push(fileData);
             // });
+
+            // let images = [];
+            // for await (const img of images2) {
+            //     let dataTruncated;
+            //     await sharp(img, { failOnError: false })
+            //         .resize({ width: 1080, height: 1080, fit: sharp.fit.cover })
+            //         .toBuffer()
+            //         .then(data => {
+            //             dataTruncated = data;
+            //         });
+            //     images.push(dataTruncated);
+            // }
 
             console.log('images.length', images.length);
             const optionsCollages = [];
@@ -256,6 +268,10 @@ const generateCollage = async(req, res = response) => {
                     const newName = Date.now() + '.jpeg';
                     let values = [collageId, newName, newName, 'collage', idEvent, null, p.toBuffer()];
 
+                    // const src = p.jpegStream();
+                    // const dest = fs.createWriteStream(collageId + ".jpeg");
+                    // src.pipe(dest);
+
                     valuesToInsert.push(values);
                 });
 
@@ -281,7 +297,8 @@ const generateCollage = async(req, res = response) => {
     } catch (error) {
         res.status(500).json({
             ok: false,
-            msg: 'Error generating collage'
+            msg: 'Error generating collage',
+            error: error
         });
     }
 }

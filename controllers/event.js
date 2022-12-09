@@ -118,7 +118,7 @@ const saveEvent = async(req, res = response) => {
             query += 'UTC_TIMESTAMP, \'' + startDate + '\', ';
             query += endDate ? '\'' + endDate + '\', ' : null + ', ';
             query += capacity ? '\'' + capacity + '\', ' : null + ', ';
-            query += '\'' + creator + '\', \'' + type + '\', \'' + status + '\', ' + null + ')';
+            query += '\'' + creator + '\', \'' + type + '\', \'' + status + '\' )';
 
             conexionDB(query, function(err, rows) {
                 if (err) {
